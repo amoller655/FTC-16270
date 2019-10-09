@@ -1,0 +1,185 @@
+package org.firstinspires.ftc.teamcode;
+
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.IntegratingGyroscope;
+import com.qualcomm.robotcore.util.Range;
+
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+
+public class DriveTrain {
+
+//    MOTORS
+    private DcMotor leftFront;
+    private DcMotor rightFront;
+    private DcMotor leftRear;
+    private DcMotor rightRear;
+
+//    GYRO
+    private IntegratingGyroscope gyro;
+
+//    TELEMETRY
+    private Telemetry telemetry;
+
+//    CONSTRUCTOR
+    public DriveTrain(DcMotor leftFront, DcMotor rightFront, DcMotor leftRear, DcMotor rightRear, IntegratingGyroscope gyro, Telemetry telemetry){
+        this.leftFront = leftFront;
+        this.rightFront = rightFront;
+        this.leftRear = leftRear;
+        this.rightRear = rightRear;
+        this.gyro = gyro;
+
+        telemetry.addData("DriveTrain Startup ", "Initiating");
+        telemetry.update();
+
+        leftFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        leftRear.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightRear.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        leftFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        leftRear.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightRear.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        leftFront.setDirection(DcMotorSimple.Direction.REVERSE);
+        leftRear.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        leftFront.setPower(0.0);
+        rightFront.setPower(0.0);
+        leftRear.setPower(0.0);
+        rightRear.setPower(0.0);
+
+        telemetry.addData("DriveTrain Startup ", "Completed");
+    }
+
+    public void setMotorPower(double x, double y, double z){
+        /*
+        Guide to motor Powers:
+        Left Front: y + x + z
+        Right Front: y - x - z
+        Left Rear: y + x - z
+        Right Rear: y - x + z
+         */
+        leftFront.setPower(Range.clip((y + x + z), -1.0, 1.0));
+        rightFront.setPower(Range.clip((y - x - z), -1.0, 1.0));
+        leftRear.setPower(Range.clip((y + x - z), -1.0, 1.0));
+        rightRear.setPower(Range.clip((y - x + z), -1.0, 1.0));
+    }
+
+    public void drive(Direction direction, double power){
+        switch(direction){
+            case N:
+                leftFront.setPower(power);
+                rightFront.setPower(power);
+                leftRear.setPower(power);
+                rightRear.setPower(power);
+                break;
+            case S:
+                leftFront.setPower(-power);
+                rightFront.setPower(-power);
+                leftRear.setPower(-power);
+                rightRear.setPower(-power);
+                break;
+            case W:
+                leftFront.setPower(-power);
+                leftRear.setPower(power);
+                rightFront.setPower(power);
+                rightRear.setPower(-power);
+                break;
+            case E:
+                leftFront.setPower(power);
+                leftRear.setPower(-power);
+                rightFront.setPower(-power);
+                rightRear.setPower(power);
+                break;
+            case TURNLEFT:
+                leftFront.setPower(-power);
+                leftRear.setPower(-power);
+                rightFront.setPower(power);
+                rightRear.setPower(power);
+                break;
+            case TURNRIGHT:
+                leftFront.setPower(power);
+                leftRear.setPower(power);
+                rightFront.setPower(-power);
+                rightRear.setPower(-power);
+                break;
+            case NW:
+                leftFront.setPower(power);
+                leftRear.setPower(0.0);
+                rightFront.setPower(0.0);
+                rightRear.setPower(power);
+                break;
+            case NE:
+                leftFront.setPower(0.0);
+                leftRear.setPower(power);
+                rightFront.setPower(power);
+                rightRear.setPower(0.0);
+                break;
+            case SW:
+                leftFront.setPower(0.0);
+                leftRear.setPower(-power);
+                rightFront.setPower(-power);
+                rightRear.setPower(0.0);
+                break;
+            case SE:
+                leftFront.setPower(-power);
+                leftRear.setPower(0.0);
+                rightFront.setPower(0.0);
+                rightRear.setPower(-power);
+                break;
+            case ENE:
+                leftFront.setPower(power);
+                leftRear.setPower(-power/2);
+                rightFront.setPower(-power/2);
+                rightRear.setPower(power);
+                break;
+            case NNE:
+                leftFront.setPower(power);
+                rightFront.setPower(power/2);
+                leftRear.setPower(power/2);
+                rightRear.setPower(power);
+                break;
+            case NNW:
+                leftFront.setPower(power/2);
+                rightFront.setPower(power);
+                leftRear.setPower(power);
+                rightRear.setPower(power/2);
+                break;
+            case WNW:
+                leftFront.setPower(-power/2);
+                rightFront.setPower(power);
+                leftRear.setPower(power);
+                rightRear.setPower(-power);
+                break;
+            case WSW:
+                leftFront.setPower(-power);
+                rightFront.setPower(power/2);
+                leftRear.setPower(power/2);
+                rightRear.setPower(-power/2);
+                break;
+        }
+    }
+
+    public enum Direction{
+        N,
+        S,
+        E,
+        W,
+        TURNRIGHT,
+        TURNLEFT,
+        NE,
+        SE,
+        NW,
+        SW,
+        ENE,
+        NNE,
+        NNW,
+        WNW,
+        WSW,
+        SSW,
+        SSE,
+        ESE
+    }
+}
