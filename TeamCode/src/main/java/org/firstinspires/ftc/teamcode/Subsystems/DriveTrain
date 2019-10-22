@@ -1,4 +1,5 @@
-package org.firstinspires.ftc.teamcode;
+
+package org.firstinspires.ftc.teamcode.Subsystems;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -16,18 +17,18 @@ public class DriveTrain {
     private DcMotor rightRear;
 
 //    GYRO
-    private IntegratingGyroscope gyro;
+
 
 //    TELEMETRY
     private Telemetry telemetry;
 
 //    CONSTRUCTOR
-    public DriveTrain(DcMotor leftFront, DcMotor rightFront, DcMotor leftRear, DcMotor rightRear, IntegratingGyroscope gyro, Telemetry telemetry){
+    public DriveTrain(DcMotor leftFront, DcMotor rightFront, DcMotor leftRear, DcMotor rightRear, Telemetry telemetry){
         this.leftFront = leftFront;
         this.rightFront = rightFront;
         this.leftRear = leftRear;
         this.rightRear = rightRear;
-        this.gyro = gyro;
+
 
         telemetry.addData("DriveTrain Startup ", "Initiating");
         telemetry.update();
@@ -160,6 +161,13 @@ public class DriveTrain {
                 rightRear.setPower(-power/2);
                 break;
         }
+    }
+
+    public void stop(){
+        leftFront.setPower(0.0);
+        rightFront.setPower(0.0);
+        leftRear.setPower(0.0);
+        rightRear.setPower(0.0);
     }
 
     public enum Direction{

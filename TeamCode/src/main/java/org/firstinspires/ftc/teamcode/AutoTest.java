@@ -27,14 +27,14 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.firstinspires.ftc.robotcontroller.external.samples;
+package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.util.Range;
+
+import org.firstinspires.ftc.teamcode.Subsystems.DriveTrain;
 
 
 /**
@@ -50,14 +50,18 @@ import com.qualcomm.robotcore.util.Range;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@TeleOp(name="Basic: Linear OpMode", group="Linear Opmode")
-@Disabled
-public class BasicOpMode_Linear extends LinearOpMode {
+@Autonomous(name="Auto Test", group="Linear Opmode")
+
+public class AutoTest extends LinearOpMode {
 
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
-    private DcMotor leftDrive = null;
-    private DcMotor rightDrive = null;
+    private DcMotor leftFront;
+    private DcMotor rightFront;
+    private DcMotor leftRear;
+    private DcMotor rightRear;
+
+    public DriveTrain driveTrain;
 
     @Override
     public void runOpMode() {
@@ -67,49 +71,69 @@ public class BasicOpMode_Linear extends LinearOpMode {
         // Initialize the hardware variables. Note that the strings used here as parameters
         // to 'get' must correspond to the names assigned during the robot configuration
         // step (using the FTC Robot Controller app on the phone).
-        leftDrive  = hardwareMap.get(DcMotor.class, "left_drive");
-        rightDrive = hardwareMap.get(DcMotor.class, "right_drive");
+        leftFront = hardwareMap.dcMotor.get("leftFront");
+        rightFront = hardwareMap.dcMotor.get("rightFront");
+        leftRear = hardwareMap.dcMotor.get("leftRear");
+        rightRear = hardwareMap.dcMotor.get("rightRear");
 
-        // Most robots need the motor on one side to be reversed to drive forward
-        // Reverse the motor that runs backwards when connected directly to the battery
-        leftDrive.setDirection(DcMotor.Direction.FORWARD);
-        rightDrive.setDirection(DcMotor.Direction.REVERSE);
+        driveTrain = new DriveTrain(leftFront, rightFront, leftRear, rightRear, telemetry);
+
+
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
         runtime.reset();
-
-        // run until the end of the match (driver presses STOP)
-        while (opModeIsActive()) {
-
-            // Setup a variable for each drive wheel to save power level for telemetry
-            double leftPower;
-            double rightPower;
-
-            // Choose to drive using either Tank Mode, or POV Mode
-            // Comment out the method that's not used.  The default below is POV.
-
-            // POV Mode uses left stick to go forward, and right stick to turn.
-            // - This uses basic math to combine motions and is easier to drive straight.
-            double drive = -gamepad1.left_stick_y;
-            double turn  =  gamepad1.right_stick_x;
-            leftPower    = Range.clip(drive + turn, -1.0, 1.0) ;
-            rightPower   = Range.clip(drive - turn, -1.0, 1.0) ;
-
-            // Tank Mode uses one stick to control each wheel.
-            // - This requires no math, but it is hard to drive forward slowly and keep straight.
-            // leftPower  = -gamepad1.left_stick_y ;
-            // rightPower = -gamepad1.right_stick_y ;
-
-            // Send calculated power to wheels
-            leftDrive.setPower(leftPower);
-            rightDrive.setPower(rightPower);
-
-
-            // Show the elapsed game time and wheel power.
-            telemetry.addData("Status", "Run Time: " + runtime.toString());
-            telemetry.addData("Motors", "left (%.2f), right (%.2f)", leftPower, rightPower);
-            telemetry.update();
+        while(runtime.seconds() < 1.0) driveTrain.drive(DriveTrain.Direction.N, 0.5);
+        runtime.reset();
+        while(runtime.seconds() < 0.5)driveTrain.stop();
+        runtime.reset();
+        while(runtime.seconds() < 1.0) driveTrain.drive(DriveTrain.Direction.S, 0.5);
+        runtime.reset();
+        while(runtime.seconds() < 0.5)driveTrain.stop();
+        runtime.reset();
+        while(runtime.seconds() < 1.0) driveTrain.drive(DriveTrain.Direction.E, 0.5);
+        runtime.reset();
+        while(runtime.seconds() < 0.5)driveTrain.stop();
+        runtime.reset();
+        while(runtime.seconds() < 1.0) driveTrain.drive(DriveTrain.Direction.W, 0.5);
+        runtime.reset();
+        while(runtime.seconds() < 0.5)driveTrain.stop();
+        runtime.reset();
+        while(runtime.seconds() < 1.0) driveTrain.drive(DriveTrain.Direction.TURNLEFT, 0.5);
+        runtime.reset();
+        while(runtime.seconds() < 0.5)driveTrain.stop();
+        runtime.reset();
+        while(runtime.seconds() < 1.0) driveTrain.drive(DriveTrain.Direction.TURNRIGHT, 0.5);
+        runtime.reset();
+        while(runtime.seconds() < 2.5)driveTrain.stop();
+        runtime.reset();
+        double x = 1.0;
+        double y = 0.0;
+        int quad = 1;
+        while(quad == 1){
+            driveTrain.setMotorPower(x, y, 0);
+            x -= 0.1;
+            y += 0.1;
+            if(y == 1.0) quad++;
         }
+        while(quad == 2){
+            driveTrain.setMotorPower(x, y, 0);
+            x -= 0.1;
+            y -= 0.1;
+            if(y == 0) quad++;
+        }
+        while(quad == 3){
+            driveTrain.setMotorPower(x, y, 0);
+            x += 0.1;
+            y -= 0.1;
+            if(y == -1.0) quad++;
+        }
+        while(quad == 4){
+            driveTrain.setMotorPower(x, y, 0);
+            x += 0.1;
+            y += 0.1;
+            if(y == 0) quad++;
+        }
+        driveTrain.stop();
     }
 }
