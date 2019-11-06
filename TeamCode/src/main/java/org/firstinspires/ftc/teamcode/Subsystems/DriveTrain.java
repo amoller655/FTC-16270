@@ -1,12 +1,17 @@
 
 package org.firstinspires.ftc.teamcode.Subsystems;
 
+import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.IntegratingGyroscope;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.Position;
+import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
 
 public class DriveTrain{
 
@@ -16,19 +21,33 @@ public class DriveTrain{
     private DcMotor leftRear;
     private DcMotor rightRear;
 
-//    GYRO
-
+//    IMU
+    private BNO055IMU imu;
+    private BNO055IMU.Parameters parameters;
+    private BNO055IMU.AccelerationIntegrator accel;
 
 //    TELEMETRY
     private Telemetry telemetry;
 
 //    CONSTRUCTOR
-    public DriveTrain(DcMotor leftFront, DcMotor rightFront, DcMotor leftRear, DcMotor rightRear, Telemetry telemetry){
+    public DriveTrain(DcMotor leftFront, DcMotor rightFront, DcMotor leftRear, DcMotor rightRear, BNO055IMU imu, Telemetry telemetry){
         this.leftFront = leftFront;
         this.rightFront = rightFront;
         this.leftRear = leftRear;
         this.rightRear = rightRear;
 
+        this.imu = imu;
+
+        parameters = new BNO055IMU.Parameters();
+        parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
+        parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
+        parameters.calibrationDataFile = "Hub1Alone.json";
+        parameters.loggingEnabled = true;
+        parameters.loggingTag = "IMU";
+        parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
+
+        imu.initialize(parameters);
+        imu.startAccelerationIntegration(new Position(DistanceUnit.INCH, 0, 0, 0, 0), new Velocity(DistanceUnit.INCH, 0, 0, 0, 0), 10);
 
         telemetry.addData("DriveTrain.java Startup ", "Initiating");
         telemetry.update();
@@ -54,6 +73,33 @@ public class DriveTrain{
         telemetry.addData("DriveTrain.java Startup ", "Completed");
     }
 
+    public double getXPos(){
+        return imu.getPosition().x;
+    }
+
+    public double getYPos(){
+        return imu.getPosition().y;
+    }
+
+    public double getZPos(){
+        return imu.getPosition().z;
+    }
+
+    public double getXVel(){
+        return imu.getVelocity().xVeloc;
+    }
+
+    public double getYVel(){
+        return imu.getVelocity().yVeloc;
+    }
+
+    public double getZVel(){
+        return imu.getVelocity().zVeloc;
+    }
+
+    public double getXAcc(){
+        return imu.getAcceleration()
+    }
     public void setMotorPower(double x, double y, double z){
         /*
         Guide to motor Powers:
