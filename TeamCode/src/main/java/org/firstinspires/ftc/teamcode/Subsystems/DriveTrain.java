@@ -30,7 +30,7 @@ public class DriveTrain{
         this.rightRear = rightRear;
 
 
-        telemetry.addData("DriveTrain Startup ", "Initiating");
+        telemetry.addData("DriveTrain.java Startup ", "Initiating");
         telemetry.update();
 
         leftFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -51,7 +51,7 @@ public class DriveTrain{
         leftRear.setPower(0.0);
         rightRear.setPower(0.0);
 
-        telemetry.addData("DriveTrain Startup ", "Completed");
+        telemetry.addData("DriveTrain.java Startup ", "Completed");
     }
 
     public void setMotorPower(double x, double y, double z){
