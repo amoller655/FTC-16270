@@ -1,6 +1,7 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -33,6 +34,8 @@ public class AutoTest extends LinearOpMode {
     private DcMotor leftRear;
     private DcMotor rightRear;
 
+    private BNO055IMU imu;
+
     DriveTrain driveTrain;
 
     @Override
@@ -48,7 +51,9 @@ public class AutoTest extends LinearOpMode {
         leftRear = hardwareMap.dcMotor.get("leftRear");
         rightRear = hardwareMap.dcMotor.get("rightRear");
 
-        driveTrain = new DriveTrain(leftFront, rightFront, leftRear, rightRear, telemetry);
+        imu = hardwareMap.get(BNO055IMU.class, "imu");
+
+        driveTrain = new DriveTrain(leftFront, rightFront, leftRear, rightRear, imu, telemetry);
 
 
 

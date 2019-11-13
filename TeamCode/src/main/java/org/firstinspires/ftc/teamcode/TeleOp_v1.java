@@ -84,7 +84,7 @@ public class TeleOp_v1 extends OpMode
         rightRear = hardwareMap.dcMotor.get("rightRear");
 
         imu = hardwareMap.get(BNO055IMU.class, "imu");
-        DistanceUnit.INCH.from
+
 
         driveTrain = new DriveTrain(leftFront, rightFront, leftRear, rightRear, imu, telemetry);
 
@@ -110,36 +110,51 @@ public class TeleOp_v1 extends OpMode
      */
     @Override
     public void loop() {
-        telemetry.addData("left_stick_x: ", gamepad1.left_stick_x);
-        telemetry.addData("left_stick_y: ", gamepad1.left_stick_y);
-        telemetry.addData("right_stick_x: ", gamepad1.right_stick_x);
-        telemetry.addData("right_stick_y: ", gamepad1.right_stick_y);
-        telemetry.addData("left_stick_button: ", gamepad1.left_stick_button);
-        telemetry.addData("right_stick_button: ", gamepad1.right_stick_button);
-        telemetry.addData("a: ", gamepad1.a);
-        telemetry.addData("b: ", gamepad1.b);
-        telemetry.addData("x: ", gamepad1.x);
-        telemetry.addData("y: ", gamepad1.y);
-        telemetry.addData("dpad_up: ", gamepad1.dpad_up);
-        telemetry.addData("dpad_down: ", gamepad1.dpad_down);
-        telemetry.addData("dpad_left: ", gamepad1.dpad_left);
-        telemetry.addData("dpad_right: ", gamepad1.dpad_right);
-        telemetry.addData("right_bumper: ", gamepad1.right_bumper);
-        telemetry.addData("left_bumper: ", gamepad1.left_bumper);
-        telemetry.addData("right_trigger: ", gamepad1.right_trigger);
-        telemetry.addData("left_trigger: ", gamepad1.left_trigger);
-        telemetry.update();
+//        telemetry.addData("left_stick_x: ", gamepad1.left_stick_x);
+//        telemetry.addData("left_stick_y: ", gamepad1.left_stick_y);
+//        telemetry.addData("right_stick_x: ", gamepad1.right_stick_x);
+//        telemetry.addData("right_stick_y: ", gamepad1.right_stick_y);
+//        telemetry.addData("left_stick_button: ", gamepad1.left_stick_button);
+//        telemetry.addData("right_stick_button: ", gamepad1.right_stick_button);
+//        telemetry.addData("a: ", gamepad1.a);
+//        telemetry.addData("b: ", gamepad1.b);
+//        telemetry.addData("x: ", gamepad1.x);
+//        telemetry.addData("y: ", gamepad1.y);
+//        telemetry.addData("dpad_up: ", gamepad1.dpad_up);
+//        telemetry.addData("dpad_down: ", gamepad1.dpad_down);
+//        telemetry.addData("dpad_left: ", gamepad1.dpad_left);
+//        telemetry.addData("dpad_right: ", gamepad1.dpad_right);
+//        telemetry.addData("right_bumper: ", gamepad1.right_bumper);
+//        telemetry.addData("left_bumper: ", gamepad1.left_bumper);
+//        telemetry.addData("right_trigger: ", gamepad1.right_trigger);
+//        telemetry.addData("left_trigger: ", gamepad1.left_trigger);
+//        telemetry.update();
 
-//        x = gamepad1.left_stick_x;
-//        y = -gamepad1.left_stick_y;
-//        if(gamepad1.dpad_left) z = -0.5;
-//        else if(gamepad1.dpad_right) z = 0.5;
-//        else z = 0;
+        x = gamepad1.left_stick_x;
+        y = gamepad1.left_stick_y;
+        if(gamepad1.left_bumper) z = -0.5;
+        else if(gamepad1.right_bumper) z = 0.5;
+        else z = 0;
 //        telemetry.addData("x: ", x);
 //        telemetry.addData("y: ", y);
 //        telemetry.addData("z: ", z);
 //        telemetry.update();
-//        driveTrain.setMotorPower(x,y,z);
+        driveTrain.setMotorPower(x,y,z);
+
+
+        telemetry.addLine("Position")
+                .addData("X", driveTrain.getXPos())
+                .addData("Y", driveTrain.getYPos())
+                .addData("Z", driveTrain.getZPos());
+        telemetry.addLine("Velocity")
+                .addData("X", driveTrain.getXVel())
+                .addData("Y", driveTrain.getYVel())
+                .addData("Z", driveTrain.getZVel());
+        telemetry.addLine("Acceleration")
+                .addData("X", driveTrain.getXAcc())
+                .addData("Y", driveTrain.getYAcc())
+                .addData("Z", driveTrain.getZAcc());
+        telemetry.update();
     }
 
     /*

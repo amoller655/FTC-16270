@@ -9,6 +9,7 @@ import com.qualcomm.robotcore.hardware.IntegratingGyroscope;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.navigation.Acceleration;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
@@ -25,6 +26,24 @@ public class DriveTrain{
     private BNO055IMU imu;
     private BNO055IMU.Parameters parameters;
     private BNO055IMU.AccelerationIntegrator accel;
+
+    private Position pos;
+    private Velocity vel;
+    private Acceleration acc;
+
+    private double xPos;
+    private double yPos;
+    private double zPos;
+
+    private double xVel;
+    private double yVel;
+    private double zVel;
+
+    private double xAcc;
+    private double yAcc;
+    private double zAcc;
+
+    private int pollIntervalMS;
 
 //    TELEMETRY
     private Telemetry telemetry;
@@ -47,7 +66,16 @@ public class DriveTrain{
         parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
 
         imu.initialize(parameters);
-        imu.startAccelerationIntegration(new Position(DistanceUnit.INCH, 0, 0, 0, 0), new Velocity(DistanceUnit.INCH, 0, 0, 0, 0), 10);
+
+        pos = new Position(DistanceUnit.INCH, 0, 0, 0, 0);
+        vel = new Velocity(DistanceUnit.INCH, 0, 0, 0, 0);
+        acc = new Acceleration(DistanceUnit.INCH, 0, 0, 0, 0);
+
+        pollIntervalMS = 10;
+
+        imu.startAccelerationIntegration(pos, vel, pollIntervalMS);
+
+
 
         telemetry.addData("DriveTrain.java Startup ", "Initiating");
         telemetry.update();
@@ -62,8 +90,8 @@ public class DriveTrain{
         leftRear.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightRear.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        leftFront.setDirection(DcMotorSimple.Direction.REVERSE);
-        leftRear.setDirection(DcMotorSimple.Direction.REVERSE);
+//        leftFront.setDirection(DcMotorSimple.Direction.REVERSE);
+//        leftRear.setDirection(DcMotorSimple.Direction.REVERSE);
 
         leftFront.setPower(0.0);
         rightFront.setPower(0.0);
@@ -71,9 +99,10 @@ public class DriveTrain{
         rightRear.setPower(0.0);
 
         telemetry.addData("DriveTrain.java Startup ", "Completed");
+
     }
 
-    public double getXPos(){
+    public double getXPos() {
         return imu.getPosition().x;
     }
 
@@ -98,20 +127,36 @@ public class DriveTrain{
     }
 
     public double getXAcc(){
-        return imu.getAcceleration()
+        return imu.getAcceleration().xAccel;
     }
+
+    public double getYAcc()  {
+        return imu.getAcceleration().yAccel;
+    }
+
+    public double getZAcc(){
+        return imu.getAcceleration().zAccel;
+    }
+
+
+
+    public void getHeading(){
+
+    }
+
     public void setMotorPower(double x, double y, double z){
+
         /*
         Guide to motor Powers:
-        Left Front: y + x + z
+        Left Front: - (y + x + z)
         Right Front: y - x - z
-        Left Rear: y + x - z
-        Right Rear: y - x + z
+        Left Rear:  - (y - x + z)
+        Right Rear:  y + x - z
          */
-        leftFront.setPower(Range.clip((y + x + z), -1.0, 1.0));
-        rightFront.setPower(Range.clip((y - x - z), -1.0, 1.0));
-        leftRear.setPower(Range.clip((y + x - z), -1.0, 1.0));
-        rightRear.setPower(Range.clip((y - x + z), -1.0, 1.0));
+        this.leftFront.setPower(Range.clip(-(y+x+z),-1,1));
+        this.rightFront.setPower(Range.clip((y-x-z),-1,1));
+        this.leftRear.setPower(Range.clip(-(y-x+z),-1,1));
+        this.rightRear.setPower(Range.clip((y+x-z), -1, 1));
     }
 
     public void drive(Direction direction, double power){
