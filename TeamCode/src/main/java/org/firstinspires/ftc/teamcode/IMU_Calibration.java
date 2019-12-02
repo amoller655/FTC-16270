@@ -29,14 +29,11 @@
 
 package org.firstinspires.ftc.teamcode;
 
-import android.text.method.Touch;
-
 import com.qualcomm.hardware.adafruit.AdafruitBNO055IMU;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.util.ReadWriteFile;
 
 import org.firstinspires.ftc.robotcore.external.Func;
@@ -50,7 +47,7 @@ import java.io.File;
 import java.util.Locale;
 
 /**
- * {@link SensorBNO055IMUCalibration} calibrates the IMU accelerometer per
+ * {@link IMU_Calibration} calibrates the IMU accelerometer per
  * "Section 3.11 Calibration" of the BNO055 specification.
  *
  * <p>Manual calibration of the IMU is definitely NOT necessary: except for the magnetometer
@@ -102,8 +99,8 @@ import java.util.Locale;
  * @see <a href="https://ae-bst.resource.bosch.com/media/_tech/media/datasheets/BST_BNO055_DS000_14.pdf">BNO055 specification</a>
  */
 @TeleOp(name = "Sensor: BNO055 IMU Calibration", group = "Sensor")
-                            // Uncomment this to add to the opmode list
-public class SensorBNO055IMUCalibration extends LinearOpMode
+//@Disabled                            // Uncomment this to add to the opmode list
+public class IMU_Calibration extends LinearOpMode
     {
     //----------------------------------------------------------------------------------------------
     // State
@@ -111,7 +108,6 @@ public class SensorBNO055IMUCalibration extends LinearOpMode
 
     // Our sensors, motors, and other devices go here, along with other long term state
     BNO055IMU imu;
-    DigitalChannel touch;
 
     // State used for updating telemetry
     Orientation angles;
@@ -140,9 +136,6 @@ public class SensorBNO055IMUCalibration extends LinearOpMode
         imu = hardwareMap.get(BNO055IMU.class, "imu");
         imu.initialize(parameters);
 
-        touch = hardwareMap.get(DigitalChannel.class, "touch");
-        touch.setMode(DigitalChannel.Mode.INPUT);
-
         composeTelemetry();
         telemetry.log().add("Waiting for start...");
 
@@ -156,7 +149,7 @@ public class SensorBNO055IMUCalibration extends LinearOpMode
 
         while (opModeIsActive()) {
 
-            if (!touch.getState()) {
+            if (gamepad1.a) {
 
                 // Get the calibration data
                 BNO055IMU.CalibrationData calibrationData = imu.readCalibrationData();
@@ -166,13 +159,13 @@ public class SensorBNO055IMUCalibration extends LinearOpMode
                 // when you initialize the IMU in an opmode in which it is used. If you
                 // have more than one IMU on your robot, you'll of course want to use
                 // different configuration file names for each.
-                String filename = "Hub1Alone.json";
+                String filename = "AdafruitIMUCalibration.json";
                 File file = AppUtil.getInstance().getSettingsFile(filename);
                 ReadWriteFile.writeFile(file, calibrationData.serialize());
                 telemetry.log().add("saved to '%s'", filename);
 
                 // Wait for the button to be released
-                while (!touch.getState()) {
+                while (gamepad1.a) {
                     telemetry.update();
                     idle();
                 }

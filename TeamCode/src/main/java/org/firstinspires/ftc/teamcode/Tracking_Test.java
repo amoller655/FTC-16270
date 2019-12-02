@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.Subsystems.DriveTrain;
@@ -13,6 +14,11 @@ public class Tracking_Test extends OpMode {
 
     private DriveTrain driveTrain;
 
+    private DcMotor rightFront;
+    private DcMotor leftFront;
+    private DcMotor rightRear;
+    private DcMotor leftRear;
+
     private BNO055IMU imu;
 
     private ElapsedTime runtime;
@@ -22,9 +28,16 @@ public class Tracking_Test extends OpMode {
 
     @Override
     public void init() {
+        rightFront = hardwareMap.dcMotor.get("rightFront");
+        leftFront = hardwareMap.dcMotor.get("leftFront");
+        rightRear = hardwareMap.dcMotor.get("rightRear");
+        leftRear = hardwareMap.dcMotor.get("leftRear");
+
         imu = hardwareMap.get(BNO055IMU.class, "imu");
-        driveTrain = new DriveTrain(imu, telemetry);
+        driveTrain = new DriveTrain(leftFront, rightFront, leftRear, rightRear, imu, telemetry);
         state = 1;
+
+        runtime = new ElapsedTime();
     }
 
     @Override
@@ -55,7 +68,7 @@ public class Tracking_Test extends OpMode {
                 }
                 break;
             case 4:
-                if(driveTrain.getXPos() <= 6.0)
+                if(driveTrain.getYPos() > -6.0)
                 {
                     driveTrain.drive(DriveTrain.Direction.N, 0.5);
                 }

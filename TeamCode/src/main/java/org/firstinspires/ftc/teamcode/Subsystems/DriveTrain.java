@@ -89,8 +89,8 @@ public class DriveTrain{
         leftRear.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightRear.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-//        leftFront.setDirection(DcMotorSimple.Direction.REVERSE);
-//        leftRear.setDirection(DcMotorSimple.Direction.REVERSE);
+        rightFront.setDirection(DcMotorSimple.Direction.REVERSE);
+        rightRear.setDirection(DcMotorSimple.Direction.REVERSE);
 
         leftFront.setPower(0.0);
         rightFront.setPower(0.0);
@@ -192,9 +192,9 @@ public class DriveTrain{
         Left Rear:  - (y - x + z)
         Right Rear:  y + x - z
          */
-        this.leftFront.setPower(Range.clip(-(y+x+z),-1,1));
+        this.leftFront.setPower(Range.clip((y+x+z),-1,1));
         this.rightFront.setPower(Range.clip((y-x-z),-1,1));
-        this.leftRear.setPower(Range.clip(-(y-x+z),-1,1));
+        this.leftRear.setPower(Range.clip((y-x+z),-1,1));
         this.rightRear.setPower(Range.clip((y+x-z), -1, 1));
     }
 
