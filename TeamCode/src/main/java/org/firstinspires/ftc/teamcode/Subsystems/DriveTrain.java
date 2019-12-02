@@ -45,6 +45,8 @@ public class DriveTrain{
 
     private int pollIntervalMS;
 
+    private boolean integrating;
+
 //    TELEMETRY
     private Telemetry telemetry;
 
@@ -63,7 +65,6 @@ public class DriveTrain{
         parameters.calibrationDataFile = "Hub1Alone.json";
         parameters.loggingEnabled = true;
         parameters.loggingTag = "IMU";
-        parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
 
         imu.initialize(parameters);
 
@@ -73,9 +74,7 @@ public class DriveTrain{
 
         pollIntervalMS = 10;
 
-        imu.startAccelerationIntegration(pos, vel, pollIntervalMS);
-
-
+        integrating = false;
 
         telemetry.addData("DriveTrain.java Startup ", "Initiating");
         telemetry.update();
@@ -112,7 +111,6 @@ public class DriveTrain{
         parameters.calibrationDataFile = "Hub1Alone.json";
         parameters.loggingEnabled = true;
         parameters.loggingTag = "IMU";
-        parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
 
         imu.initialize(parameters);
 
@@ -122,7 +120,7 @@ public class DriveTrain{
 
         pollIntervalMS = 10;
 
-        imu.startAccelerationIntegration(pos, vel, pollIntervalMS);
+
     }
 
     public double getXPos() {
@@ -130,7 +128,7 @@ public class DriveTrain{
     }
 
     public double getYPos(){
-        return BNO055IMU.AccelerationIntegrator.getPosition().y;
+        return imu.getPosition().y;
     }
 
     public double getZPos(){
@@ -160,6 +158,24 @@ public class DriveTrain{
     public double getZAcc(){
         return imu.getAcceleration().zAccel;
     }
+
+    public void startIntegration()
+    {
+        imu.startAccelerationIntegration(pos, vel, pollIntervalMS);
+        integrating = true;
+    }
+
+    public void stopIntegration()
+    {
+        imu.stopAccelerationIntegration();
+        integrating = false;
+    }
+
+    public boolean integrating()
+    {
+        return integrating;
+    }
+
 
 
 
@@ -282,6 +298,42 @@ public class DriveTrain{
         rightFront.setPower(0.0);
         leftRear.setPower(0.0);
         rightRear.setPower(0.0);
+    }
+
+    public boolean distDrive(double inches, Direction direction, double power)
+    {
+        boolean done;
+        if(!integrating) startIntegration();
+
+        switch(direction){
+            case N:
+                done = !(getXPos() < inches);
+                break;
+            case S:
+                done = !(getXPos() > -inches);
+                break;
+            case E:
+                done = !(getZPos() < inches);
+                break;
+            case W:
+                done = !(getZPos() > -inches);
+                break;
+            default:
+                done = true;
+                break;
+        }
+
+        if(!done)
+        {
+            drive(direction, power);
+            return false;
+        }
+        else
+        {
+            stop();
+            stopIntegration();
+            return true;
+        }
     }
 
     public enum Direction{
