@@ -102,12 +102,35 @@ public class DriveTrain{
 
     }
 
+    public DriveTrain(BNO055IMU imu, Telemetry telemetry)
+    {
+        this.imu = imu;
+
+        parameters = new BNO055IMU.Parameters();
+        parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
+        parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
+        parameters.calibrationDataFile = "Hub1Alone.json";
+        parameters.loggingEnabled = true;
+        parameters.loggingTag = "IMU";
+        parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
+
+        imu.initialize(parameters);
+
+        pos = new Position(DistanceUnit.INCH, 0, 0, 0, 0);
+        vel = new Velocity(DistanceUnit.INCH, 0, 0, 0, 0);
+        acc = new Acceleration(DistanceUnit.INCH, 0, 0, 0, 0);
+
+        pollIntervalMS = 10;
+
+        imu.startAccelerationIntegration(pos, vel, pollIntervalMS);
+    }
+
     public double getXPos() {
         return imu.getPosition().x;
     }
 
     public double getYPos(){
-        return imu.getPosition().y;
+        return BNO055IMU.AccelerationIntegrator.getPosition().y;
     }
 
     public double getZPos(){
