@@ -10,11 +10,38 @@ import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.Acceleration;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
 
 public class DriveTrain{
+
+    private int leftPos;
+    private int rightPos;
+    private double avgEncoderPos;
+
+    private double startPos;
+    private double goalPos;
+
+    private final int SHAFT_CPR = 1440;
+    private final int WHEEL_CPR = 720;
+    private final int DIAMETER = 4;
+    private final double CIRCUMFERENCE = DIAMETER * Math.PI;
+    private final double INPERPULSE = CIRCUMFERENCE / WHEEL_CPR;
+    private final double PULSEPERIN = WHEEL_CPR / CIRCUMFERENCE;
+
+    private float goalDegrees;
+    private int GYRO_RANGE = 3;
+
+
+    private boolean canDrive;
+
+
+
 
 //    MOTORS
     private DcMotor leftFront;
@@ -25,27 +52,6 @@ public class DriveTrain{
 //    IMU
     private BNO055IMU imu;
     private BNO055IMU.Parameters parameters;
-    private BNO055IMU.AccelerationIntegrator accel;
-
-    private Position pos;
-    private Velocity vel;
-    private Acceleration acc;
-
-    private double xPos;
-    private double yPos;
-    private double zPos;
-
-    private double xVel;
-    private double yVel;
-    private double zVel;
-
-    private double xAcc;
-    private double yAcc;
-    private double zAcc;
-
-    private int pollIntervalMS;
-
-    private boolean integrating;
 
 //    TELEMETRY
     private Telemetry telemetry;
@@ -68,26 +74,22 @@ public class DriveTrain{
 
         imu.initialize(parameters);
 
-        pos = new Position(DistanceUnit.INCH, 0, 0, 0, 0);
-        vel = new Velocity(DistanceUnit.INCH, 0, 0, 0, 0);
-        acc = new Acceleration(DistanceUnit.INCH, 0, 0, 0, 0);
 
-        pollIntervalMS = 10;
 
-        integrating = false;
+        this.telemetry = telemetry;
 
-        telemetry.addData("DriveTrain.java Startup ", "Initiating");
-        telemetry.update();
+        this.telemetry.addData("DriveTrain.java Startup ", "Initiating");
+        this.telemetry.update();
 
         leftFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         leftRear.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightRear.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        leftFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rightFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        leftRear.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rightRear.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        leftFront.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        rightFront.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        leftRear.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        rightRear.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         rightFront.setDirection(DcMotorSimple.Direction.REVERSE);
         rightRear.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -97,8 +99,13 @@ public class DriveTrain{
         leftRear.setPower(0.0);
         rightRear.setPower(0.0);
 
+        canDrive = true;
+
         telemetry.addData("DriveTrain.java Startup ", "Completed");
 
+        startPos = -1;
+        goalPos = startPos;
+        goalDegrees = -1;
     }
 
     public DriveTrain(BNO055IMU imu, Telemetry telemetry)
@@ -113,71 +120,7 @@ public class DriveTrain{
         parameters.loggingTag = "IMU";
 
         imu.initialize(parameters);
-
-        pos = new Position(DistanceUnit.INCH, 0, 0, 0, 0);
-        vel = new Velocity(DistanceUnit.INCH, 0, 0, 0, 0);
-        acc = new Acceleration(DistanceUnit.INCH, 0, 0, 0, 0);
-
-        pollIntervalMS = 10;
-
-
     }
-
-    public double getXPos() {
-        return imu.getPosition().x;
-    }
-
-    public double getYPos(){
-        return imu.getPosition().y;
-    }
-
-    public double getZPos(){
-        return imu.getPosition().z;
-    }
-
-    public double getXVel(){
-        return imu.getVelocity().xVeloc;
-    }
-
-    public double getYVel(){
-        return imu.getVelocity().yVeloc;
-    }
-
-    public double getZVel(){
-        return imu.getVelocity().zVeloc;
-    }
-
-    public double getXAcc(){
-        return imu.getAcceleration().xAccel;
-    }
-
-    public double getYAcc()  {
-        return imu.getAcceleration().yAccel;
-    }
-
-    public double getZAcc(){
-        return imu.getAcceleration().zAccel;
-    }
-
-    public void startIntegration()
-    {
-        imu.startAccelerationIntegration(pos, vel, pollIntervalMS);
-        integrating = true;
-    }
-
-    public void stopIntegration()
-    {
-        imu.stopAccelerationIntegration();
-        integrating = false;
-    }
-
-    public boolean integrating()
-    {
-        return integrating;
-    }
-
-
-
 
     public void getHeading(){
 
@@ -300,41 +243,121 @@ public class DriveTrain{
         rightRear.setPower(0.0);
     }
 
-    public boolean distDrive(double inches, Direction direction, double power)
+    public void resetEncoders()
     {
-        boolean done;
-        if(!integrating) startIntegration();
+        leftFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-        switch(direction){
+        leftFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+    }
+
+    public boolean encoderDrive(Direction direction, double inches, double power)
+    {
+        leftPos = leftFront.getCurrentPosition();
+        rightPos = rightFront.getCurrentPosition();
+        avgEncoderPos = (double) (leftPos + rightPos) / 2;
+        if(canDrive)
+        {
+
+            goalPos = (inches * PULSEPERIN) + avgEncoderPos;
+            canDrive = false;
+            return canDrive;
+        }
+        switch(direction)
+        {
             case N:
-                done = !(getXPos() < inches);
+                if(avgEncoderPos < goalPos)
+                {
+                    drive(direction, power);
+                    telemetry.addLine()
+                            .addData("Current pos: ", avgEncoderPos)
+                            .addData(" Goal Pos: ", goalPos);
+                } else {
+                    canDrive = true;
+                    goalPos = startPos;
+                    stop();
+                    return canDrive;
+                }
                 break;
             case S:
-                done = !(getXPos() > -inches);
-                break;
-            case E:
-                done = !(getZPos() < inches);
-                break;
-            case W:
-                done = !(getZPos() > -inches);
-                break;
-            default:
-                done = true;
+                if(avgEncoderPos > goalPos)
+                {
+                    drive(direction, power);
+                    telemetry.addLine()
+                            .addData("Current pos: ", avgEncoderPos)
+                            .addData(" Goal Pos: ", goalPos);
+                } else {
+                    canDrive = true;
+                    goalPos = startPos;
+                    stop();
+                    return canDrive;
+                }
                 break;
         }
+        return canDrive;
+    }
 
-        if(!done)
+    public boolean gyroTurn(Direction direction, double power, float degrees)
+    {
+        switch(direction)
         {
-            drive(direction, power);
-            return false;
+            case TURNLEFT:
+                if (goalDegrees == -1)
+                {
+                    goalDegrees = (this.getYaw() + degrees);
+                    if(goalDegrees > 360) goalDegrees -= 360;
+                }
+                if(!(getYaw() < (goalDegrees + GYRO_RANGE) && (getYaw() > (goalDegrees - GYRO_RANGE))))
+                {
+                    drive(direction, power);
+
+                    telemetry.addLine()
+                            .addData("Goal degrees: ", goalDegrees)
+                            .addData(" Current degrees: ", getYaw());
+                    return false;
+                } else {
+                    stop();
+                    goalDegrees = -1;
+                    return true;
+                }
+
+            case TURNRIGHT:
+                if (goalDegrees == -1)
+                {
+                    goalDegrees = (this.getYaw() - degrees);
+                    if(goalDegrees < 0) goalDegrees += 360;
+                }
+                if(!(getYaw() < (goalDegrees + GYRO_RANGE) && (getYaw() > (goalDegrees - GYRO_RANGE))))
+                {
+                    drive(direction, power);
+
+                    telemetry.addLine()
+                            .addData("Goal degrees: ", goalDegrees)
+                            .addData(" Current degrees: ", getYaw());
+                    return false;
+                } else {
+                    stop();
+                    goalDegrees = -1;
+                    return true;
+                }
+
         }
-        else
+        return false;
+    }
+
+    public float getYaw()
+    {
+        Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+        if(AngleUnit.DEGREES.fromUnit(angles.angleUnit, angles.firstAngle) < 0)
         {
-            stop();
-            stopIntegration();
-            return true;
+            return (360 + AngleUnit.DEGREES.fromUnit(angles.angleUnit, angles.firstAngle));
+        } else {
+            return AngleUnit.DEGREES.fromUnit(angles.angleUnit, angles.firstAngle);
         }
     }
+
+
 
     public enum Direction{
         N,
