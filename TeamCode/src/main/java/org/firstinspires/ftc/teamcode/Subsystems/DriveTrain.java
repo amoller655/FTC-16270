@@ -48,7 +48,7 @@ public class DriveTrain{
 //    TELEMETRY
     private Telemetry telemetry;
 
-//    CONSTRUCTOR
+//    CONSTRUCTOR (FULL)
     public DriveTrain(DcMotor leftFront, DcMotor rightFront, DcMotor leftRear, DcMotor rightRear, BNO055IMU imu, Telemetry telemetry){
         this.leftFront = leftFront;
         this.rightFront = rightFront;
@@ -99,6 +99,20 @@ public class DriveTrain{
         rightRear.setPower(0.0);
 
         telemetry.addData("DriveTrain.java Startup ", "Completed");
+
+    }
+
+//    CONSTRUCTOR (IMU ONLY)
+    public DriveTrain (BNO055IMU imu, Telemetry telemetry)
+    {
+        this.imu = imu;
+
+        parameters = new BNO055IMU.Parameters();
+        parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
+        parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
+        parameters.calibrationDataFile = "Hub1Alone.json":
+        parameters.loggingEnabled = true;
+        parameters.loggingTag = "IMU";
 
     }
 
