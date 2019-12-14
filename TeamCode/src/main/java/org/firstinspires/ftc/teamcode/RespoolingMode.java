@@ -30,7 +30,6 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -52,87 +51,29 @@ import org.firstinspires.ftc.teamcode.Subsystems.DriveTrain;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name="Autonomous version 0.1", group="Main")
+@TeleOp(name="Respooling Mode", group="Util")
 
-public class AutoTest extends OpMode
+public class RespoolingMode extends OpMode
 {
     // Declare OpMode members.
-    private DriveTrain driveTrain;
 
-    private DcMotor leftFront;
-    private DcMotor rightFront;
-    private DcMotor leftRear;
-    private DcMotor rightRear;
-
-    private Servo grabbyLeft;
-    private Servo grabbyRight;
-
-    private Servo bigGrabby;
     private DcMotor lifty;
 
-    private BNO055IMU imu;
-
-    private double x;
-    private double y;
-    private double z;
-
-    double leftPos = 0.0;
-    double rightPos = 0.0;
-    double bigPos = 0.0;
-
-
-    private int encoder;
-    private int encoderMin;
-    private int encoderMax;
-
-    private boolean bigGrab;
-    private boolean pressed1;
-    private boolean lilGrab;
-    private boolean pressed2;
-
-    private int state;
-    private boolean isFinished;
 
     /*
      * Code to run ONCE when the driver hits INIT
      */
     @Override
     public void init() {
-        leftFront = hardwareMap.dcMotor.get("leftFront");
-        rightFront = hardwareMap.dcMotor.get("rightFront");
-        leftRear = hardwareMap.dcMotor.get("leftRear");
-        rightRear = hardwareMap.dcMotor.get("rightRear");
 
-        grabbyLeft = hardwareMap.servo.get("leftGrabber");
-        grabbyRight = hardwareMap.servo.get("rightGrabber");
-
-        bigGrabby = hardwareMap.servo.get("mainGrabber");
         lifty = hardwareMap.dcMotor.get("lift");
 
-        imu = hardwareMap.get(BNO055IMU.class, "imu");
-
-
-        driveTrain = new DriveTrain(leftFront, rightFront, leftRear, rightRear, imu, telemetry);
 
         lifty.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         lifty.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
 
 
-        encoderMin = lifty.getCurrentPosition();
-        encoderMax = encoderMin - 4700;
-
-        grabbyLeft.setPosition(0.45);
-        grabbyRight.setPosition(0.45);
-        bigGrabby.setPosition(0.95);
-
-        bigGrab = false;
-        pressed1 = false;
-        lilGrab = false;
-        pressed2 = false;
-
-        state = 1;
-        isFinished = false;
     }
 
     /*
@@ -155,37 +96,9 @@ public class AutoTest extends OpMode
      */
     @Override
     public void loop() {
-        switch(state){
-            case 1:
-                if(driveTrain.encoderDrive(DriveTrain.Direction.N, 12, 0.5))
-                {
-                    state++;
-                }
-                break;
-            case 2:
-                if(driveTrain.gyroTurn(DriveTrain.Direction.TURNLEFT, 0.25, 90))
-                {
-                    state++;
-                }
-                break;
-            case 3:
-                if(driveTrain.gyroTurn(DriveTrain.Direction.TURNRIGHT, .4, 90))
-                {
-                    state++;
-                }
-                break;
-            case 4:
-                if(driveTrain.encoderDrive(DriveTrain.Direction.S, 12, 0.25))
-                {
-                    state++;
-                }
-                break;
-            case 5:
-                telemetry.addLine("Done! ");
-                break;
-        }
-        telemetry.addData("State: ", state);
-        telemetry.update();
+
+       lifty.setPower(-(gamepad1.left_stick_y / 2));
+       telemetry.addData("Pos: ", lifty.getCurrentPosition());
     }
 
     /*

@@ -30,14 +30,12 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.Range;
 
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.Subsystems.DriveTrain;
 
 /**
@@ -66,12 +64,31 @@ public class TeleOp_v1 extends OpMode
     private DcMotor leftRear;
     private DcMotor rightRear;
 
+    private Servo grabbyLeft;
+    private Servo grabbyRight;
+
+    private Servo bigGrabby;
+    private DcMotor lifty;
+
     private BNO055IMU imu;
 
     private double x;
     private double y;
     private double z;
 
+    double leftPos = 0.0;
+    double rightPos = 0.0;
+    double bigPos = 0.0;
+
+
+    private int encoder;
+    private int encoderMin;
+    private int encoderMax;
+
+    private boolean bigGrab;
+    private boolean pressed1;
+    private boolean lilGrab;
+    private boolean pressed2;
 
     /*
      * Code to run ONCE when the driver hits INIT
@@ -83,11 +100,33 @@ public class TeleOp_v1 extends OpMode
         leftRear = hardwareMap.dcMotor.get("leftRear");
         rightRear = hardwareMap.dcMotor.get("rightRear");
 
+        grabbyLeft = hardwareMap.servo.get("leftGrabber");
+        grabbyRight = hardwareMap.servo.get("rightGrabber");
+
+        bigGrabby = hardwareMap.servo.get("mainGrabber");
+        lifty = hardwareMap.dcMotor.get("lift");
+
         imu = hardwareMap.get(BNO055IMU.class, "imu");
 
 
         driveTrain = new DriveTrain(leftFront, rightFront, leftRear, rightRear, imu, telemetry);
 
+        lifty.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        lifty.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+
+
+        encoderMin = lifty.getCurrentPosition();
+        encoderMax = encoderMin - 4700;
+
+        grabbyLeft.setPosition(0.45);
+        grabbyRight.setPosition(0.45);
+        bigGrabby.setPosition(0.95);
+
+        bigGrab = false;
+        pressed1 = false;
+        lilGrab = false;
+        pressed2 = false;
     }
 
     /*
@@ -110,50 +149,91 @@ public class TeleOp_v1 extends OpMode
      */
     @Override
     public void loop() {
-//        telemetry.addData("left_stick_x: ", gamepad1.left_stick_x);
-//        telemetry.addData("left_stick_y: ", gamepad1.left_stick_y);
-//        telemetry.addData("right_stick_x: ", gamepad1.right_stick_x);
-//        telemetry.addData("right_stick_y: ", gamepad1.right_stick_y);
-//        telemetry.addData("left_stick_button: ", gamepad1.left_stick_button);
-//        telemetry.addData("right_stick_button: ", gamepad1.right_stick_button);
-//        telemetry.addData("a: ", gamepad1.a);
-//        telemetry.addData("b: ", gamepad1.b);
-//        telemetry.addData("x: ", gamepad1.x);
-//        telemetry.addData("y: ", gamepad1.y);
-//        telemetry.addData("dpad_up: ", gamepad1.dpad_up);
-//        telemetry.addData("dpad_down: ", gamepad1.dpad_down);
-//        telemetry.addData("dpad_left: ", gamepad1.dpad_left);
-//        telemetry.addData("dpad_right: ", gamepad1.dpad_right);
-//        telemetry.addData("right_bumper: ", gamepad1.right_bumper);
-//        telemetry.addData("left_bumper: ", gamepad1.left_bumper);
-//        telemetry.addData("right_trigger: ", gamepad1.right_trigger);
-//        telemetry.addData("left_trigger: ", gamepad1.left_trigger);
-//        telemetry.update();
+
 
         x = gamepad1.left_stick_x;
-        y = gamepad1.left_stick_y;
+        y = -gamepad1.left_stick_y;
         if(gamepad1.left_bumper) z = -0.5;
         else if(gamepad1.right_bumper) z = 0.5;
         else z = 0;
-//        telemetry.addData("x: ", x);
-//        telemetry.addData("y: ", y);
-//        telemetry.addData("z: ", z);
-//        telemetry.update();
+
+        encoder = lifty.getCurrentPosition();
         driveTrain.setMotorPower(x,y,z);
 
+        if(gamepad1.right_stick_x==1 && encoder >= encoderMax){
+            lifty.setPower(-0.75);
+        } else if(gamepad1.right_stick_y == 1 && encoder <= encoderMin){
+            lifty.setPower(0.75);
+        } else {
+            lifty.setPower(0);
+        }
 
-        telemetry.addLine("Position")
-                .addData("X", driveTrain.getXPos())
-                .addData("Y", driveTrain.getYPos())
-                .addData("Z", driveTrain.getZPos());
-        telemetry.addLine("Velocity")
-                .addData("X", driveTrain.getXVel())
-                .addData("Y", driveTrain.getYVel())
-                .addData("Z", driveTrain.getZVel());
-        telemetry.addLine("Acceleration")
-                .addData("X", driveTrain.getXAcc())
-                .addData("Y", driveTrain.getYAcc())
-                .addData("Z", driveTrain.getZAcc());
+        if(gamepad1.a && !pressed1)
+        {
+            bigGrab = !bigGrab;
+            pressed1 = true;
+        } else if (!gamepad1.a && pressed1)
+        {
+            pressed1 = false;
+        }
+
+        if(gamepad1.x && !pressed2)
+        {
+            lilGrab = !lilGrab;
+            pressed2 = true;
+        } else if (!gamepad1.x && pressed2)
+        {
+            pressed2 = false;
+        }
+
+        if(lilGrab)
+        {
+            grabbyLeft.setPosition(0.0);
+            grabbyRight.setPosition(1.0);
+        }
+        else
+        {
+            grabbyLeft.setPosition(0.45);
+            grabbyRight.setPosition(0.45);
+        }
+
+        if(bigGrab)
+        {
+            bigGrabby.setPosition(0.05);
+        }
+        else
+        {
+            bigGrabby.setPosition(0.80);
+        }
+
+//        if(gamepad1.dpad_left){
+//            bigPos -= 0.01;
+//        } else if(gamepad1.dpad_right)
+//        {
+//            bigPos += 0.01;
+//        } bigPos = Range.clip(bigPos, 0.0, 1.0);
+//
+//        if(gamepad1.a){
+//            leftPos -= 0.01;
+//        } else if(gamepad1.b){
+//            leftPos += 0.01;
+//        } leftPos = Range.clip(leftPos, 0.0, 1.0);
+//
+//        if(gamepad1.x){
+//            rightPos -= 0.01;
+//        } else if(gamepad1.y){
+//            rightPos += 0.01;
+//        } rightPos = Range.clip(rightPos, 0.0, 1.0);
+
+
+
+        telemetry.addLine()
+                .addData("Big Pos: ", bigPos)
+                .addData(" Left Pos: ", leftPos)
+                .addData(" Right Pos: ", rightPos);
+        telemetry.addData("Lift encoder: ", lifty.getCurrentPosition());
+
+
         telemetry.update();
     }
 

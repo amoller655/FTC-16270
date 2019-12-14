@@ -27,12 +27,11 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.Autonomous;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 
@@ -52,9 +51,9 @@ import org.firstinspires.ftc.teamcode.Subsystems.DriveTrain;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name="Autonomous version 0.1", group="Main")
+@Autonomous(name= "Park-Close-Left", group="Left")
 
-public class AutoTest extends OpMode
+public class Short_Park_Left extends OpMode
 {
     // Declare OpMode members.
     private DriveTrain driveTrain;
@@ -157,30 +156,25 @@ public class AutoTest extends OpMode
     public void loop() {
         switch(state){
             case 1:
-                if(driveTrain.encoderDrive(DriveTrain.Direction.N, 12, 0.5))
+                if(driveTrain.encoderDrive(DriveTrain.Direction.N, 6, 0.25))
                 {
-                    state++;
+                    state = 2;
                 }
                 break;
             case 2:
-                if(driveTrain.gyroTurn(DriveTrain.Direction.TURNLEFT, 0.25, 90))
+                if(driveTrain.gyroTurn(DriveTrain.Direction.TURNRIGHT, 0.25, 90))
                 {
-                    state++;
+                    state = 3;
                 }
                 break;
             case 3:
-                if(driveTrain.gyroTurn(DriveTrain.Direction.TURNRIGHT, .4, 90))
+                if(driveTrain.encoderDrive(DriveTrain.Direction.N, 6, 0.25))
                 {
-                    state++;
+                    state = 4;
                 }
                 break;
             case 4:
-                if(driveTrain.encoderDrive(DriveTrain.Direction.S, 12, 0.25))
-                {
-                    state++;
-                }
-                break;
-            case 5:
+                stop();
                 telemetry.addLine("Done! ");
                 break;
         }
