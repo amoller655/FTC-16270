@@ -101,7 +101,7 @@ public class DriveTrain{
 
         canDrive = true;
 
-    }
+
 
 //    CONSTRUCTOR (IMU ONLY)
 
@@ -362,27 +362,5 @@ public class DriveTrain{
             return AngleUnit.DEGREES.fromUnit(angles.angleUnit, angles.firstAngle);
         }
     }
-
-
-
-    public enum Direction{
-        N,
-        S,
-        E,
-        W,
-        TURNRIGHT,
-        TURNLEFT,
-        NE,
-        SE,
-        NW,
-        SW,
-        ENE,
-        NNE,
-        NNW,
-        WNW,
-        WSW,
-        SSW,
-        SSE,
-        ESE
-    }
 }
+
