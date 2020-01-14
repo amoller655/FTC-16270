@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.util.ReadWriteFile;
 
 import org.firstinspires.ftc.robotcore.internal.system.AppUtil;
 
@@ -134,6 +135,29 @@ public class OdometryCalibration extends LinearOpMode {
         double verticalEncoderTickOffsetPerDegree = encoderDifference/angle;
 
         double wheelBaseSeparation = (2*90*verticalEncoderTickOffsetPerDegree)/(Math.PI*COUNTS_PER_INCH);
+
+        horizontalTickOffset = horizontal.getCurrentPosition()/Math.toRadians(getZAngle());
+
+        ReadWriteFile.writeFile(wheelBaseSeparationFile, String.valueOf(wheelBaseSeparation));
+        ReadWriteFile.writeFile(horizontalTickOffsetFile, String.valueOf(horizontalTickOffset));
+
+        while(opModeIsActive())
+        {
+            telemetry.addData("Odometry System Calibration Status", "Calibration Complete");
+            //Display calculated constants
+            telemetry.addData("Wheel Base Separation", wheelBaseSeparation);
+            telemetry.addData("Horizontal Encoder Offset", horizontalTickOffset);
+
+            //Display raw values
+            telemetry.addData("IMU Angle", getZAngle());
+            telemetry.addData("Vertical Left Position", -verticalLeft.getCurrentPosition());
+            telemetry.addData("Vertical Right Position", verticalRight.getCurrentPosition());
+            telemetry.addData("Horizontal Position", horizontal.getCurrentPosition());
+            telemetry.addData("Vertical Encoder Offset", verticalEncoderTickOffsetPerDegree);
+
+            //Update values
+            telemetry.update();
+        }
     }
 
     private double getZAngle() {

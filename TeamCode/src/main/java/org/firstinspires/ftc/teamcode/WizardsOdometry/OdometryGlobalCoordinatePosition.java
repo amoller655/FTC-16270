@@ -87,6 +87,7 @@ public class OdometryGlobalCoordinatePosition implements Runnable{
         prevNormalEncoderWheelPosition = normalEncoderWheelPosition;
     }
 
+
     /**
      * Returns the robot's global x coordinate
      * @return global x coordinate
