@@ -54,6 +54,9 @@ public class Odometry implements Runnable{
         horizontalEncoderTickPerDegreeOffset = Double.parseDouble(ReadWriteFile.readFile(horizontalTickOffsetFile).trim());
     }
 
+    /**
+    * Updates the global coordinates (x, y, theta) using the odometry wheels
+    */
     private void globalPosUdpate()
     {
 //        Get current positions
@@ -76,5 +79,57 @@ public class Odometry implements Runnable{
 //        N = normal (perpendicular)
         double T = (rightChange + leftChange) / 2;
         double N = horizontalChange;
+
+//        Calculate and update position values
+        robotGlobalXPos = robotGlobalXPos + (T*Math.sin(robotOrientationRad) + N*Math.cos(robotOrientationRad));
+        robotGlobalYPos = robotGlobalYPos + (T*Math.cos(robotOrientationRad) - N*Math.sin(robotOrientationRad));
+
+//        Save current encoder positions for use in next update
+        lastVerticalLeftEncoderWheelPos = verticalLeftEncoderWheelPos;
+        lastVerticalRightEncodetWheelPos = verticalRightEncoderWheelPos;
+        lastNormalEncoderWheelPos = normalEncoderWheelPos;
+    }
+
+    public double getXPos() { return robotGlobalXPos; }
+
+    public double getYPos() { return robotGlobalYPos; }
+
+    public double getOrientation() { return Math.toDegrees(robotOrientationRad) % 360; }
+
+    public void stop() { isRunning = false; }
+
+    public void reverseLeft() {
+        if(verticalLeftEncoderPosMultiplier == 1)
+            verticalLeftEncoderPosMultiplier = -1;
+        else
+            verticalLeftEncoderPosMultiplier = 1;
+    }
+
+    public void reverseRight() {
+        if(verticalRightEncoderPosMultiplier == 1)
+            verticalRightEncoderPosMultiplier = -1;
+        else
+            verticalRightEncoderPosMultiplier = 1;
+    }
+
+    public void reverseNormal() {
+        if(normalEncoderPosMultiplier == 1)
+            normalEncoderPosMultiplier = -1;
+        else
+            normalEncoderPosMultiplier = 1;
+    }
+
+
+
+    @Override
+    public void run() {
+        while(isRunning) {
+            globalPosUdpate();
+            try {
+                Thread.sleep(sleepTime);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }
