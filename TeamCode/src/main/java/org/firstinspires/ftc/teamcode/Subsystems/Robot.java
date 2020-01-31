@@ -25,6 +25,13 @@ public class Robot {
     private BNO055IMU imu;
     private String imuName;
 
+//    CONSTANTS FOR goto()
+    private final double driveSlow1 = 6.0;
+    private final double driveSlow2 = 2.5;
+    private final double turnSlow1 = 22.5;
+    private final double turnSlow2 = 5.0;
+    private final double
+
     public Robot(HardwareMap hardwareMap, String leftFrontName, String rightFrontName, String leftRearName, String rightRearName, String imuName, Telemetry telemetry) {
         this.leftFrontName = leftFrontName;
         this.rightFrontName = rightFrontName;
@@ -96,10 +103,49 @@ public class Robot {
                 facingOffset = 0;
                 break;
         }
+        DriveTrain.Direction turn = DriveTrain.Direction.TURNRIGHT;
+        double turnPower = power;
+        double remainingTurn = 0;
         double goalAngle = wrapAngle(pathAngle - facingOffset);
-        if(theta != goalAngle)
+        if(theta != goalAngle){
+            if(theta <= goalAngle){
+                if((goalAngle - theta) <= 180){
+                    turn = DriveTrain.Direction.TURNLEFT;
+                    remainingTurn = goalAngle - theta;
+                }
+                else {
+                    turn = DriveTrain.Direction.TURNRIGHT;
+                    remainingTurn = 360 - (goalAngle - theta);
+                }
 
-
+            } else {
+                if((theta - goalAngle) <= 180){
+                    turn = DriveTrain.Direction.TURNRIGHT;
+                    remainingTurn = theta - goalAngle;
+                }
+                else {
+                    turn = DriveTrain.Direction.TURNLEFT;
+                    remainingTurn = 360 - (theta - goalAngle);
+                }
+            }
+            if(remainingTurn <= 5)
+                turnPower = power * 1 / 3;
+            if(remainingTurn <= 22.5)
+                turnPower = power * 2 / 3;
+            driveTrain.drive(turn, turnPower);
+            return false;
+        }
+        else if((x != xF) && (y != yF)) {
+            double dist =  dist(dx, dy);
+            double drivePower = power;
+            if(dist  <= 2.5)
+                drivePower = power/3;
+            else if(dist <= 6.0)
+                drivePower = power * 2/3;
+            driveTrain.drive(direction, drivePower);
+            return false;
+        }
+        return true;
     }
 
     private double calculatePathAngle(double dx, double dy)
@@ -123,5 +169,10 @@ public class Robot {
         if(angle < 0) return angle + 360;
         else if(angle >= 360) return angle - 360;
         else return angle;
+    }
+
+    private double dist(double dx, double dy)
+    {
+        return (Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2)));
     }
 }
