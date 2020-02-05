@@ -107,12 +107,7 @@ public class DriveTrain{
 
 
 
-        telemetry.addData("DriveTrain.java Startup ", "Completed");
 
-        startPos = -1;
-        goalPos = startPos;
-        goalDegrees = -1;
-    }
 
     public DriveTrain(BNO055IMU imu, Telemetry telemetry)
     {
@@ -365,24 +360,4 @@ public class DriveTrain{
 
 
 
-    public enum Direction{
-        N,
-        S,
-        E,
-        W,
-        TURNRIGHT,
-        TURNLEFT,
-        NE,
-        SE,
-        NW,
-        SW,
-        ENE,
-        NNE,
-        NNW,
-        WNW,
-        WSW,
-        SSW,
-        SSE,
-        ESE
     }
-}
