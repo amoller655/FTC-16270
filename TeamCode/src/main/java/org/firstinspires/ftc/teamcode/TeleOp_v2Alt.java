@@ -113,12 +113,14 @@ public class TeleOp_v2Alt extends OpMode
 
         driveTrain = new DriveTrain(leftFront, rightFront, leftRear, rightRear, imu, telemetry);
 
+        lifty.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
         lifty.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         lifty.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
 
 
-        encoderMin = lifty.getCurrentPosition();
+        encoderMin = 0;
         encoderMax = encoderMin + 4800;
 
         grabbyLeft.setPosition(0.45);
@@ -164,11 +166,21 @@ public class TeleOp_v2Alt extends OpMode
         encoder = lifty.getCurrentPosition();
 
 
-        if((gamepad2.left_stick_y > 0 && encoder <= encoderMax) || (gamepad2.left_stick_y < 0 && encoder >= encoderMin))
+//        if((gamepad2.left_stick_y > 0 && encoder <= encoderMax) || (gamepad2.left_stick_y < 0 && encoder >= encoderMin))
+//        {
+//            lifty.setPower(-gamepad2.left_stick_y);
+//        } else {
+//            lifty.setPower(0.0);
+//        }
+
+        if(gamepad2.dpad_up && encoder <= encoderMax)
         {
-            lifty.setPower(-gamepad2.left_stick_y);
+            lifty.setPower(.5);
+        } else if (gamepad2.dpad_down && encoder >= encoderMin)
+        {
+            lifty.setPower(-.5);
         } else {
-            lifty.setPower(0.0);
+            lifty.setPower(0);
         }
 
         if(gamepad2.a && !pressed1)
