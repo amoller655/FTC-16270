@@ -164,12 +164,16 @@ public class TeleOp_v2Alt extends OpMode
         encoder = lifty.getCurrentPosition();
 
 
-        if((gamepad2.left_stick_y > 0 && encoder <= encoderMax) || (gamepad2.left_stick_y < 0 && encoder >= encoderMin))
-        {
-            lifty.setPower(-gamepad2.left_stick_y);
-        } else {
-            lifty.setPower(0.0);
-        }
+//        if((gamepad2.left_stick_y > 0 && encoder <= encoderMax) || (gamepad2.left_stick_y < 0 && encoder >= encoderMin))
+////        {
+////            lifty.setPower(-gamepad2.left_stick_y);
+////        } else if(encoder < encoderMin){
+////            lifty.setPower(0.1);
+////        } else {
+////            lifty.setPower(0);
+////        }
+
+        lifty.setPower(-(gamepad2.left_stick_y / 2));
 
         if(gamepad2.a && !pressed1)
         {

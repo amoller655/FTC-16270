@@ -107,12 +107,7 @@ public class DriveTrain{
 
 
 
-        telemetry.addData("DriveTrain.java Startup ", "Completed");
 
-        startPos = -1;
-        goalPos = startPos;
-        goalDegrees = -1;
-    }
 
     public DriveTrain(BNO055IMU imu, Telemetry telemetry)
     {

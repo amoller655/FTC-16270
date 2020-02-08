@@ -156,10 +156,10 @@ public class Long_Park_Right extends OpMode
     public void loop() {
         switch(state){
             case 0:
-                bigGrabby.setPosition(.5);
+                bigGrabby.setPosition(.2);
                 break;
             case 1:
-                if(driveTrain.encoderDrive(DriveTrain.Direction.N, 30, 0.25))
+                if(driveTrain.encoderDrive(DriveTrain.Direction.N, 24, 0.25))
                 {
                     state = 2;
                 }

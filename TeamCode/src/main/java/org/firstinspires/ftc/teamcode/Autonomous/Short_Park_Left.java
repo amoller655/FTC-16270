@@ -146,7 +146,7 @@ public class Short_Park_Left extends OpMode
      */
     @Override
     public void start() {
-
+        bigGrabby.setPosition(.2);
     }
 
     /*

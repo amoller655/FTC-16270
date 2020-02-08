@@ -52,7 +52,7 @@ import org.firstinspires.ftc.teamcode.Subsystems.DriveTrain;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name= "Park-Close-Right-Wait", group="Right")
+@Autonomous(name= "Park-Far-Right-Wait", group="Right")
 
 public class Long_Park_Right_Wait extends OpMode
 {
@@ -161,13 +161,14 @@ public class Long_Park_Right_Wait extends OpMode
     public void loop() {
         switch(state){
             case 0:
+                bigGrabby.setPosition(.2);
                 if(time.seconds() >= 15.0)
                 {
                     state = 1;
                 }
                 break;
             case 1:
-                if(driveTrain.encoderDrive(DriveTrain.Direction.N, 30, 0.25))
+                if(driveTrain.encoderDrive(DriveTrain.Direction.N, 24, 0.25))
                 {
                     state = 2;
                 }

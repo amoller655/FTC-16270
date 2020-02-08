@@ -130,7 +130,7 @@ public class Short_Park_Right extends OpMode
         lilGrab = false;
         pressed2 = false;
 
-        state = 0;
+        state = 1;
         isFinished = false;
     }
 
@@ -146,7 +146,7 @@ public class Short_Park_Right extends OpMode
      */
     @Override
     public void start() {
-
+        bigGrabby.setPosition(.2);
     }
 
     /*
@@ -155,11 +155,6 @@ public class Short_Park_Right extends OpMode
     @Override
     public void loop() {
         switch(state){
-            case 0:
-                bigGrabby.setPosition(.5);
-                state = 1;
-                break;
-
             case 1:
                 if(driveTrain.encoderDrive(DriveTrain.Direction.N, 6, 0.25))
                 {

@@ -152,6 +152,7 @@ public class Short_Park_Right_Wait extends OpMode
     @Override
     public void start() {
         time.reset();
+        bigGrabby.setPosition(.2);
     }
 
     /*
@@ -161,7 +162,7 @@ public class Short_Park_Right_Wait extends OpMode
     public void loop() {
         switch(state){
             case 0:
-                bigGrabby.setPosition(.5);
+
                 if(time.seconds() >= 15.0)
                 {
                     state = 1;

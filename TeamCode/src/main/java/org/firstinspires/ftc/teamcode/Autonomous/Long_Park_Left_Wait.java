@@ -161,14 +161,14 @@ public class Long_Park_Left_Wait extends OpMode
     public void loop() {
         switch(state){
             case 0:
-                bigGrabby.setPosition(.5);
+                bigGrabby.setPosition(.2);
                 if(time.seconds() >= 15.0)
                 {
                     state = 1;
                 }
                 break;
             case 1:
-                if(driveTrain.encoderDrive(DriveTrain.Direction.N, 30, 0.25))
+                if(driveTrain.encoderDrive(DriveTrain.Direction.N, 24, 0.25))
                 {
                     state = 2;
                 }
