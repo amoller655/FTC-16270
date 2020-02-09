@@ -12,6 +12,7 @@ public class Robot {
 
     public Odometry odometry;
 
+
     private DcMotor leftFront, rightFront, leftRear, rightRear;
 
     private DcMotor leftEncoder, rightEncoder, normalEncoder;
@@ -30,7 +31,6 @@ public class Robot {
     private final double driveSlow2 = 2.5;
     private final double turnSlow1 = 22.5;
     private final double turnSlow2 = 5.0;
-    private final double
 
     public Robot(HardwareMap hardwareMap, String leftFrontName, String rightFrontName, String leftRearName, String rightRearName, String imuName, Telemetry telemetry) {
         this.leftFrontName = leftFrontName;
@@ -128,9 +128,9 @@ public class Robot {
                     remainingTurn = 360 - (theta - goalAngle);
                 }
             }
-            if(remainingTurn <= 5)
+            if(remainingTurn <= turnSlow2)
                 turnPower = power * 1 / 3;
-            if(remainingTurn <= 22.5)
+            if(remainingTurn <= turnSlow1)
                 turnPower = power * 2 / 3;
             driveTrain.drive(turn, turnPower);
             return false;
@@ -138,9 +138,9 @@ public class Robot {
         else if((x != xF) && (y != yF)) {
             double dist =  dist(dx, dy);
             double drivePower = power;
-            if(dist  <= 2.5)
+            if(dist  <= driveSlow2)
                 drivePower = power/3;
-            else if(dist <= 6.0)
+            else if(dist <= driveSlow1)
                 drivePower = power * 2/3;
             driveTrain.drive(direction, drivePower);
             return false;

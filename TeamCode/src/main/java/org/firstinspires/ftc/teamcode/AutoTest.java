@@ -35,6 +35,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.Subsystems.DriveTrain;
 
@@ -64,6 +65,10 @@ public class AutoTest extends OpMode
     private DcMotor leftRear;
     private DcMotor rightRear;
 
+    private DcMotor leftEncoder;
+    private DcMotor rightEncoder;
+    private DcMotor horizontalEncoder;
+
     private Servo grabbyLeft;
     private Servo grabbyRight;
 
@@ -86,12 +91,15 @@ public class AutoTest extends OpMode
     private int encoderMax;
 
     private boolean bigGrab;
-    private boolean pressed1;
-    private boolean lilGrab;
-    private boolean pressed2;
+    private boolean pressed1;;
 
     private int state;
+    private boolean lilGrab;
+    private boolean pressed2;
     private boolean isFinished;
+
+    private ElapsedTime time;
+    private double timer;
 
     /*
      * Code to run ONCE when the driver hits INIT
@@ -102,6 +110,10 @@ public class AutoTest extends OpMode
         rightFront = hardwareMap.dcMotor.get("rightFront");
         leftRear = hardwareMap.dcMotor.get("leftRear");
         rightRear = hardwareMap.dcMotor.get("rightRear");
+
+        rightEncoder = hardwareMap.dcMotor.get("rightFront");
+        leftEncoder = hardwareMap.dcMotor.get("leftFront");
+        horizontalEncoder = hardwareMap.dcMotor.get("leftRear");
 
         grabbyLeft = hardwareMap.servo.get("leftGrabber");
         grabbyRight = hardwareMap.servo.get("rightGrabber");
@@ -133,6 +145,17 @@ public class AutoTest extends OpMode
 
         state = 1;
         isFinished = false;
+
+        time = new ElapsedTime();
+
+
+        leftEncoder.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightEncoder.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        horizontalEncoder.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        leftEncoder.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        rightEncoder.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        horizontalEncoder.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
 
     /*
@@ -140,6 +163,11 @@ public class AutoTest extends OpMode
      */
     @Override
     public void init_loop() {
+        telemetry.addLine()
+                .addData("L: ", leftEncoder.getCurrentPosition())
+                .addData(" R: ", rightEncoder.getCurrentPosition())
+                .addData(" H: ", horizontalEncoder.getCurrentPosition());
+        telemetry.update();
     }
 
     /*
@@ -148,6 +176,7 @@ public class AutoTest extends OpMode
     @Override
     public void start() {
 
+        time.reset();
     }
 
     /*
@@ -155,36 +184,22 @@ public class AutoTest extends OpMode
      */
     @Override
     public void loop() {
-        switch(state){
-            case 1:
-                if(driveTrain.encoderDrive(DriveTrain.Direction.N, 12, 0.5))
-                {
-                    state++;
-                }
-                break;
-            case 2:
-                if(driveTrain.gyroTurn(DriveTrain.Direction.TURNLEFT, 0.25, 90))
-                {
-                    state++;
-                }
-                break;
-            case 3:
-                if(driveTrain.gyroTurn(DriveTrain.Direction.TURNRIGHT, .4, 90))
-                {
-                    state++;
-                }
-                break;
-            case 4:
-                if(driveTrain.encoderDrive(DriveTrain.Direction.S, 12, 0.25))
-                {
-                    state++;
-                }
-                break;
-            case 5:
-                telemetry.addLine("Done! ");
-                break;
+
+
+
+        if(time.seconds() <= 1.0){
+            timer = time.seconds();
+            driveTrain.drive(DriveTrain.Direction.N, 0.5);
         }
-        telemetry.addData("State: ", state);
+
+        else
+            driveTrain.stop();
+        telemetry.addLine()
+                .addData("L: ", leftEncoder.getCurrentPosition())
+                .addData(" R: ", rightEncoder.getCurrentPosition())
+                .addData(" H: ", horizontalEncoder.getCurrentPosition());
+        telemetry.addLine()
+                .addData("Time: ", timer);
         telemetry.update();
     }
 
