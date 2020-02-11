@@ -34,6 +34,8 @@ public class Odometry implements Runnable{
     private int verticalRightEncoderPosMultiplier = 1;
     private int normalEncoderPosMultiplier = 1;
 
+    private final double COUNTS_PER_INCH;
+
 
     /**
      * Constructor for Odometry Thread
@@ -49,6 +51,7 @@ public class Odometry implements Runnable{
         this.verticalEncoderRight = verticalEncoderRIght;
         this.horizontalEncoder = horizontalEncoder;
         sleepTime = threadSleepDelay;
+        this.COUNTS_PER_INCH = COUNTS_PER_INCH;
 
         robotEncoderWheelDist = Double.parseDouble(ReadWriteFile.readFile(wheelBaseSeparationFile).trim()) * COUNTS_PER_INCH;
         horizontalEncoderTickPerDegreeOffset = Double.parseDouble(ReadWriteFile.readFile(horizontalTickOffsetFile).trim());
@@ -90,9 +93,13 @@ public class Odometry implements Runnable{
         lastNormalEncoderWheelPos = normalEncoderWheelPos;
     }
 
-    public double getXPos() { return robotGlobalXPos; }
+    public double getXPosRaw() { return robotGlobalXPos; }
 
-    public double getYPos() { return robotGlobalYPos; }
+    public double getYPosRaw() { return robotGlobalYPos; }
+
+    public double getXPos() { return robotGlobalXPos / COUNTS_PER_INCH; }
+
+    public double getYPos() { return robotGlobalYPos / COUNTS_PER_INCH; }
 
     public double getOrientation() { return Math.toDegrees(robotOrientationRad) % 360; }
 

@@ -36,6 +36,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.Subsystems.DriveTrain;
+import org.firstinspires.ftc.teamcode.Subsystems.Robot;
 
 /**
  * This file contains an example of an iterative (Non-Linear) "OpMode".
@@ -56,7 +57,9 @@ import org.firstinspires.ftc.teamcode.Subsystems.DriveTrain;
 public class TeleOp_v2Alt extends OpMode
 {
     // Declare OpMode members.
-    private DriveTrain driveTrain;
+//    private DriveTrain driveTrain;
+
+    private Robot robot;
 
     private DcMotor leftFront;
     private DcMotor rightFront;
@@ -97,10 +100,17 @@ public class TeleOp_v2Alt extends OpMode
      */
     @Override
     public void init() {
-        leftFront = hardwareMap.dcMotor.get("leftFront");
-        rightFront = hardwareMap.dcMotor.get("rightFront");
-        leftRear = hardwareMap.dcMotor.get("leftRear");
-        rightRear = hardwareMap.dcMotor.get("rightRear");
+//        leftFront = hardwareMap.dcMotor.get("leftFront");
+//        rightFront = hardwareMap.dcMotor.get("rightFront");
+//        leftRear = hardwareMap.dcMotor.get("leftRear");
+//        rightRear = hardwareMap.dcMotor.get("rightRear");
+//
+//        leftFront.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+//        rightFront.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+//        leftRear.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+//        rightRear.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+
 
         grabbyLeft = hardwareMap.servo.get("leftGrabber");
         grabbyRight = hardwareMap.servo.get("rightGrabber");
@@ -108,10 +118,11 @@ public class TeleOp_v2Alt extends OpMode
         bigGrabby = hardwareMap.servo.get("mainGrabber");
         lifty = hardwareMap.dcMotor.get("lift");
 
-        imu = hardwareMap.get(BNO055IMU.class, "imu");
+//        imu = hardwareMap.get(BNO055IMU.class, "imu");
 
 
-        driveTrain = new DriveTrain(leftFront, rightFront, leftRear, rightRear, imu, telemetry);
+//        driveTrain = new DriveTrain(leftFront, rightFront, leftRear, rightRear, imu, telemetry);
+        robot = new Robot(hardwareMap, "leftFront", "rightFront", "leftRear", "rightRear", "imu", telemetry);
 
         lifty.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
@@ -121,7 +132,7 @@ public class TeleOp_v2Alt extends OpMode
 
 
         encoderMin = 0;
-        encoderMax = encoderMin + 4800;
+        encoderMax = encoderMin - 4800;
 
         grabbyLeft.setPosition(0.45);
         grabbyRight.setPosition(0.45);
@@ -149,7 +160,7 @@ public class TeleOp_v2Alt extends OpMode
     @Override
     public void start() {
 
-        driveTrain.resetEncoders();
+//        driveTrain.resetEncoders();
     }
 
     /*
@@ -231,9 +242,9 @@ public class TeleOp_v2Alt extends OpMode
 
         if(slowMode)
         {
-            driveTrain.setMotorPower(x/2, y/2, z/2);
+            robot.driveTrain.setMotorPower(x/2, y/2, z/2);
         } else {
-            driveTrain.setMotorPower(x,y,z);
+            robot.driveTrain.setMotorPower(x,y,z);
         }
 
 
@@ -259,9 +270,9 @@ public class TeleOp_v2Alt extends OpMode
 
 
         telemetry.addLine()
-                .addData("Big Pos: ", bigPos)
-                .addData(" Left Pos: ", leftPos)
-                .addData(" Right Pos: ", rightPos);
+                .addData("X: ", robot.odometry.getXPos())
+                .addData(" Y: ", robot.odometry.getYPos())
+                .addData(" Theta: ", robot.odometry.getOrientation());
         telemetry.addData("Lift encoder: ", lifty.getCurrentPosition());
 
 

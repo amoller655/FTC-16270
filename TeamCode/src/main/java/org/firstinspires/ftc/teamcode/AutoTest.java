@@ -38,6 +38,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.Subsystems.DriveTrain;
+import org.firstinspires.ftc.teamcode.Subsystems.Robot;
 
 /**
  * This file contains an example of an iterative (Non-Linear) "OpMode".
@@ -59,6 +60,8 @@ public class AutoTest extends OpMode
 {
     // Declare OpMode members.
     private DriveTrain driveTrain;
+
+    private Robot robot;
 
     private DcMotor leftFront;
     private DcMotor rightFront;
@@ -101,19 +104,21 @@ public class AutoTest extends OpMode
     private ElapsedTime time;
     private double timer;
 
+    private boolean hasRun = false;
+
     /*
      * Code to run ONCE when the driver hits INIT
      */
     @Override
     public void init() {
-        leftFront = hardwareMap.dcMotor.get("leftFront");
-        rightFront = hardwareMap.dcMotor.get("rightFront");
-        leftRear = hardwareMap.dcMotor.get("leftRear");
-        rightRear = hardwareMap.dcMotor.get("rightRear");
-
-        rightEncoder = hardwareMap.dcMotor.get("rightFront");
-        leftEncoder = hardwareMap.dcMotor.get("leftFront");
-        horizontalEncoder = hardwareMap.dcMotor.get("leftRear");
+//        leftFront = hardwareMap.dcMotor.get("leftFront");
+//        rightFront = hardwareMap.dcMotor.get("rightFront");
+//        leftRear = hardwareMap.dcMotor.get("leftRear");
+//        rightRear = hardwareMap.dcMotor.get("rightRear");
+//
+//        rightEncoder = hardwareMap.dcMotor.get("rightFront");
+//        leftEncoder = hardwareMap.dcMotor.get("leftFront");
+//        horizontalEncoder = hardwareMap.dcMotor.get("leftRear");
 
         grabbyLeft = hardwareMap.servo.get("leftGrabber");
         grabbyRight = hardwareMap.servo.get("rightGrabber");
@@ -121,10 +126,11 @@ public class AutoTest extends OpMode
         bigGrabby = hardwareMap.servo.get("mainGrabber");
         lifty = hardwareMap.dcMotor.get("lift");
 
-        imu = hardwareMap.get(BNO055IMU.class, "imu");
+//        imu = hardwareMap.get(BNO055IMU.class, "imu");
 
+        robot = new Robot(hardwareMap, "leftFront", "rightFront", "leftRear", "rightRear", "imu", telemetry);
 
-        driveTrain = new DriveTrain(leftFront, rightFront, leftRear, rightRear, imu, telemetry);
+//        driveTrain = new DriveTrain(leftFront, rightFront, leftRear, rightRear, imu, telemetry);
 
         lifty.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         lifty.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -149,13 +155,13 @@ public class AutoTest extends OpMode
         time = new ElapsedTime();
 
 
-        leftEncoder.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        rightEncoder.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        horizontalEncoder.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
-        leftEncoder.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        rightEncoder.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        horizontalEncoder.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+//        leftEncoder.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//        rightEncoder.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//        horizontalEncoder.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//
+//        leftEncoder.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+//        rightEncoder.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+//        horizontalEncoder.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
 
     /*
@@ -163,11 +169,11 @@ public class AutoTest extends OpMode
      */
     @Override
     public void init_loop() {
-        telemetry.addLine()
-                .addData("L: ", leftEncoder.getCurrentPosition())
-                .addData(" R: ", rightEncoder.getCurrentPosition())
-                .addData(" H: ", horizontalEncoder.getCurrentPosition());
-        telemetry.update();
+//        telemetry.addLine()
+//                .addData("L: ", leftEncoder.getCurrentPosition())
+//                .addData(" R: ", rightEncoder.getCurrentPosition())
+//                .addData(" H: ", horizontalEncoder.getCurrentPosition());
+//        telemetry.update();
     }
 
     /*
@@ -187,20 +193,14 @@ public class AutoTest extends OpMode
 
 
 
-        if(time.seconds() <= 1.0){
-            timer = time.seconds();
-            driveTrain.drive(DriveTrain.Direction.N, 0.5);
+        if(!robot.goTo(100, -100,0.5, DriveTrain.Direction.W) && !hasRun) {
+            telemetry.addLine("RUNNING");
+        } else {
+            hasRun = true;
+            telemetry.addLine("END");
         }
-
-        else
-            driveTrain.stop();
-        telemetry.addLine()
-                .addData("L: ", leftEncoder.getCurrentPosition())
-                .addData(" R: ", rightEncoder.getCurrentPosition())
-                .addData(" H: ", horizontalEncoder.getCurrentPosition());
-        telemetry.addLine()
-                .addData("Time: ", timer);
         telemetry.update();
+
     }
 
     /*

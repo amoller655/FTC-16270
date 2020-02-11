@@ -12,6 +12,8 @@ public class Robot {
 
     public Odometry odometry;
 
+    public Thread posThread;
+
 
     private DcMotor leftFront, rightFront, leftRear, rightRear;
 
@@ -29,8 +31,8 @@ public class Robot {
 //    CONSTANTS FOR goto()
     private final double driveSlow1 = 6.0;
     private final double driveSlow2 = 2.5;
-    private final double turnSlow1 = 22.5;
-    private final double turnSlow2 = 5.0;
+    private final double turnSlow1 = 45;
+    private final double turnSlow2 = 22.5;
 
     public Robot(HardwareMap hardwareMap, String leftFrontName, String rightFrontName, String leftRearName, String rightRearName, String imuName, Telemetry telemetry) {
         this.leftFrontName = leftFrontName;
@@ -40,11 +42,20 @@ public class Robot {
         this.imuName = imuName;
         this.hardwareMap = hardwareMap;
 
+        this.leftEncoderName = leftFrontName;
+        this.rightEncoderName = rightFrontName;
+        this.normalEncoderName = rightRearName;
+
         initHardwareMap(this.leftFrontName, this.rightFrontName, this.leftRearName, this.rightRearName, this.leftEncoderName, this.rightEncoderName, this.normalEncoderName, this.imuName);
 
         driveTrain = new DriveTrain(leftFront, rightFront, leftRear, rightRear, imu, telemetry);
 
-        odometry = new Odometry(leftEncoder, rightEncoder, normalEncoder, 0.0, 50);
+        odometry = new Odometry(leftEncoder, rightEncoder, normalEncoder, 288.8665556, 50);
+        odometry.reverseRight();
+        odometry.reverseNormal();
+
+        posThread = new Thread(odometry);
+        posThread.start();
     }
 
     private void initHardwareMap(String leftFrontName, String rightFrontName, String leftRearName, String rightRearName, String leftEncoderName, String rightEncoderName, String normalEncoderName, String imuName)
@@ -103,7 +114,7 @@ public class Robot {
                 facingOffset = 0;
                 break;
         }
-        DriveTrain.Direction turn = DriveTrain.Direction.TURNRIGHT;
+        DriveTrain.Direction turn;
         double turnPower = power;
         double remainingTurn = 0;
         double goalAngle = wrapAngle(pathAngle - facingOffset);
@@ -129,23 +140,29 @@ public class Robot {
                 }
             }
             if(remainingTurn <= turnSlow2)
-                turnPower = power * 1 / 3;
+                driveTrain.drive(turn, (power/3));
             if(remainingTurn <= turnSlow1)
-                turnPower = power * 2 / 3;
-            driveTrain.drive(turn, turnPower);
+                driveTrain.drive(turn, (power*2/3));
+            else
+                driveTrain.drive(turn, turnPower);
             return false;
         }
-        else if((x != xF) && (y != yF)) {
-            double dist =  dist(dx, dy);
-            double drivePower = power;
-            if(dist  <= driveSlow2)
-                drivePower = power/3;
-            else if(dist <= driveSlow1)
-                drivePower = power * 2/3;
-            driveTrain.drive(direction, drivePower);
-            return false;
+        else {
+            driveTrain.stop();
+            return true;
         }
-        return true;
+
+//        else if((x != xF) && (y != yF)) {
+//            double dist =  dist(dx, dy);
+//            double drivePower = power;
+//            if(dist  <= driveSlow2)
+//                drivePower = power/3;
+//            else if(dist <= driveSlow1)
+//                drivePower = power * 2/3;
+//            driveTrain.drive(direction, drivePower);
+//            return false;
+//        }
+//        return true;
     }
 
     private double calculatePathAngle(double dx, double dy)

@@ -80,23 +80,23 @@ public class DriveTrain{
         this.telemetry.addData("DriveTrain.java Startup ", "Initiating");
         this.telemetry.update();
 
-        leftFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        rightFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        leftRear.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        rightRear.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        this.leftFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        this.rightFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        this.leftRear.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        this.rightRear.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        leftFront.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        rightFront.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        leftRear.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        rightRear.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        this.leftFront.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        this.rightFront.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        this.leftRear.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        this.rightRear.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-        rightFront.setDirection(DcMotorSimple.Direction.REVERSE);
-        rightRear.setDirection(DcMotorSimple.Direction.REVERSE);
-
-        leftFront.setPower(0.0);
-        rightFront.setPower(0.0);
-        leftRear.setPower(0.0);
-        rightRear.setPower(0.0);
+        this.rightFront.setDirection(DcMotorSimple.Direction.REVERSE);
+        this.rightRear.setDirection(DcMotorSimple.Direction.REVERSE);
+        
+        this.leftFront.setPower(0.0);
+        this.rightFront.setPower(0.0);
+        this.leftRear.setPower(0.0);
+        this.rightRear.setPower(0.0);
 
         canDrive = true;
     }
@@ -248,8 +248,8 @@ public class DriveTrain{
         leftFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rightFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-        leftFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rightFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        leftFront.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        rightFront.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
 
     public boolean encoderDrive(Direction direction, double inches, double power)
