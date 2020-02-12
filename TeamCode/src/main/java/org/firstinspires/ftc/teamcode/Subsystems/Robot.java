@@ -28,6 +28,7 @@ public class Robot {
     private BNO055IMU imu;
     private String imuName;
 
+    public Telemetry telemetry;
 //    CONSTANTS FOR goto()
     private final double driveSlow1 = 6.0;
     private final double driveSlow2 = 2.5;
@@ -46,17 +47,19 @@ public class Robot {
         this.rightEncoderName = rightFrontName;
         this.normalEncoderName = rightRearName;
 
+        this.telemetry = telemetry;
+
         initHardwareMap(this.leftFrontName, this.rightFrontName, this.leftRearName, this.rightRearName, this.leftEncoderName, this.rightEncoderName, this.normalEncoderName, this.imuName);
 
         driveTrain = new DriveTrain(leftFront, rightFront, leftRear, rightRear, imu, telemetry);
 
         odometry = new Odometry(leftEncoder, rightEncoder, normalEncoder, 288.8665556, 50);
-        odometry.reverseRight();
+//        odometry.reverseRight();
         odometry.reverseNormal();
 
         posThread = new Thread(odometry);
         posThread.start();
-    }
+}
 
     private void initHardwareMap(String leftFrontName, String rightFrontName, String leftRearName, String rightRearName, String leftEncoderName, String rightEncoderName, String normalEncoderName, String imuName)
     {
@@ -82,7 +85,11 @@ public class Robot {
         double dx = xF - x;
         double dy = yF - y;
 
-        double pathAngle = Math.toDegrees(calculatePathAngle(dx, dy));
+        telemetry.addLine()
+                .addData("dX: ", dx)
+                .addData("dY", dy);
+
+        double pathAngle = calculatePathAngle(dx, dy);
         double facingOffset = 0.0;
         switch(direction)
         {
@@ -118,7 +125,9 @@ public class Robot {
         double turnPower = power;
         double remainingTurn = 0;
         double goalAngle = wrapAngle(pathAngle - facingOffset);
-        if(theta != goalAngle){
+        telemetry.addLine().addData("PATH: ", pathAngle);
+        telemetry.addLine().addData("GOAL: ", goalAngle);
+        if(theta > wrapAngle(goalAngle + 10) || theta < wrapAngle(goalAngle - 10)){
             if(theta <= goalAngle){
                 if((goalAngle - theta) <= 180){
                     turn = DriveTrain.Direction.TURNLEFT;
@@ -139,6 +148,7 @@ public class Robot {
                     remainingTurn = 360 - (theta - goalAngle);
                 }
             }
+            telemetry.addLine().addData("Remaining Turn: ", remainingTurn);
             if(remainingTurn <= turnSlow2)
                 driveTrain.drive(turn, (power/3));
             if(remainingTurn <= turnSlow1)
@@ -147,39 +157,39 @@ public class Robot {
                 driveTrain.drive(turn, turnPower);
             return false;
         }
+
+        else if((x > xF + .5 || x < xF - .5) || (y > yF + .5 || y < yF - .5)) {
+            double dist =  dist(dx, dy);
+            double drivePower = power;
+            if(dist  <= driveSlow2)
+                drivePower = power/3;
+            else if(dist <= driveSlow1)
+                drivePower = power * 2/3;
+            driveTrain.drive(direction, drivePower);
+            if(theta > goalAngle)
+            {
+                double correction = (theta - goalAngle) / 10;
+                driveTrain.adjust(DriveTrain.Direction.TURNLEFT, correction);
+            } else if (theta < goalAngle)
+            {
+                double correction = (goalAngle - theta) / 10;
+                driveTrain.adjust(DriveTrain.Direction.TURNRIGHT, correction);
+            }
+            return false;
+        } 
         else {
             driveTrain.stop();
             return true;
         }
 
-//        else if((x != xF) && (y != yF)) {
-//            double dist =  dist(dx, dy);
-//            double drivePower = power;
-//            if(dist  <= driveSlow2)
-//                drivePower = power/3;
-//            else if(dist <= driveSlow1)
-//                drivePower = power * 2/3;
-//            driveTrain.drive(direction, drivePower);
-//            return false;
-//        }
-//        return true;
     }
 
     private double calculatePathAngle(double dx, double dy)
     {
-        if(dy == 0)
-        {
-            if(dx > 0) return 0;
-            else if(dx < 0) return 180;
-        }
-        else if(dx == 0)
-        {
-            if(dy > 0) return 90;
-            else if(dy < 0) return 270;
-        }
-        else if (dx > 0) return (360 + Math.atan2(dx, dy)) % 360;
-        else if (dx < 0) return (180 + Math.atan2(dx, dy));
-        return 0;
+        double angle = Math.toDegrees(Math.atan2(dy, dx));
+        if(angle < 0)
+            angle += 360;
+        return angle;
     }
 
     private double wrapAngle(double angle) {

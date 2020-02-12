@@ -236,6 +236,37 @@ public class DriveTrain{
         }
     }
 
+    public void adjust(Direction direction, double correction)
+    {
+        double lf = leftFront.getPower();
+        double rf = rightFront.getPower();
+        double lr = leftRear.getPower();
+        double rr = rightRear.getPower();
+        switch(direction)
+        {
+            case TURNLEFT:
+                lf -= correction/2;
+                lr -= correction/2;
+                rf += correction/2;
+                rr += correction/2;
+                break;
+            case TURNRIGHT:
+                lf += correction/2;
+                lr += correction/2;
+                rf -= correction/2;
+                rr -= correction/2;
+                break;
+        }
+        lf = Range.clip(lf, -1.0, 1.0);
+        lr = Range.clip(lr, -1.0, 1.0);
+        rf = Range.clip(rf, -1.0, 1.0);
+        rr = Range.clip(rr, -1.0, 1.0);
+        leftFront.setPower(lf);
+        rightFront.setPower(rf);
+        leftRear.setPower(lr);
+        rightRear.setPower(rr);
+    }
+
     public void stop(){
         leftFront.setPower(0.0);
         rightFront.setPower(0.0);

@@ -193,12 +193,13 @@ public class AutoTest extends OpMode
 
 
 
-        if(!robot.goTo(100, -100,0.5, DriveTrain.Direction.W) && !hasRun) {
+        if(!robot.goTo(36, 24,.5, DriveTrain.Direction.N) && !hasRun) {
             telemetry.addLine("RUNNING");
         } else {
             hasRun = true;
             telemetry.addLine("END");
         }
+        telemetry.addData("ANGLE ", robot.odometry.getOrientation());
         telemetry.update();
 
     }

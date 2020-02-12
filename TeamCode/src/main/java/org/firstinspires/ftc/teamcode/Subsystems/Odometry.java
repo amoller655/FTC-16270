@@ -101,10 +101,15 @@ public class Odometry implements Runnable{
 
     public double getYPos() { return robotGlobalYPos / COUNTS_PER_INCH; }
 
-    public double getOrientation() { return Math.toDegrees(robotOrientationRad) % 360; }
+    public double getOrientation() { return wrapAngle(Math.toDegrees(robotOrientationRad)); }
 
     public void stop() { isRunning = false; }
 
+    private double wrapAngle(double angle) {
+        if(angle < 0) return angle + 360;
+        else if(angle >= 360) return angle - 360;
+        else return angle;
+    }
     public void reverseLeft() {
         if(verticalLeftEncoderPosMultiplier == 1)
             verticalLeftEncoderPosMultiplier = -1;

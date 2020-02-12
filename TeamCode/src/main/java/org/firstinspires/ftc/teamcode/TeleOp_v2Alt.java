@@ -95,6 +95,8 @@ public class TeleOp_v2Alt extends OpMode
     private boolean slowMode;
     private boolean pressed3;
 
+    private boolean done = false;
+
     /*
      * Code to run ONCE when the driver hits INIT
      */
@@ -132,10 +134,10 @@ public class TeleOp_v2Alt extends OpMode
 
 
         encoderMin = 0;
-        encoderMax = encoderMin - 4800;
+        encoderMax = encoderMin - 4700;
 
-        grabbyLeft.setPosition(0.45);
-        grabbyRight.setPosition(0.45);
+        grabbyLeft.setPosition(1);
+        grabbyRight.setPosition(0);
         bigGrabby.setPosition(0.95);
 
         bigGrab = false;
@@ -170,11 +172,16 @@ public class TeleOp_v2Alt extends OpMode
     public void loop() {
 
 
-        x = gamepad1.left_stick_x;
-        y = -gamepad1.left_stick_y;
-        z = gamepad1.right_stick_x;
+//        if (gamepad1.x && !done) {
+//            done = robot.goTo(0,0,0.5, DriveTrain.Direction.N);
+//        }
+//        else if(!gamepad1.x){
+//            done = false;
+            x = gamepad1.left_stick_x;
+            y = -gamepad1.left_stick_y;
+            z = gamepad1.right_stick_x;
 
-        encoder = lifty.getCurrentPosition();
+            encoder = lifty.getCurrentPosition();
 
 
 //        if((gamepad2.left_stick_y > 0 && encoder <= encoderMax) || (gamepad2.left_stick_y < 0 && encoder >= encoderMin))
@@ -184,69 +191,69 @@ public class TeleOp_v2Alt extends OpMode
 //            lifty.setPower(0.0);
 //        }
 
-        if(gamepad2.dpad_up && encoder <= encoderMax)
-        {
-            lifty.setPower(.5);
-        } else if (gamepad2.dpad_down && encoder >= encoderMin)
-        {
-            lifty.setPower(-.5);
-        } else {
-            lifty.setPower(0);
-        }
+            if(gamepad2.dpad_up && encoder >= encoderMax)
+            {
+                lifty.setPower(-.5);
+            } else if (gamepad2.dpad_down && encoder <= encoderMin)
+            {
+                lifty.setPower(.5);
+            } else {
+                lifty.setPower(0);
+            }
 
-        if(gamepad2.a && !pressed1)
-        {
-            bigGrab = !bigGrab;
-            pressed1 = true;
-        } else if (!gamepad2.a && pressed1)
-        {
-            pressed1 = false;
-        }
+            if(gamepad2.a && !pressed1)
+            {
+                bigGrab = !bigGrab;
+                pressed1 = true;
+            } else if (!gamepad2.a && pressed1)
+            {
+                pressed1 = false;
+            }
 
-        if(gamepad2.x && !pressed2)
-        {
-            lilGrab = !lilGrab;
-            pressed2 = true;
-        } else if (!gamepad2.x && pressed2)
-        {
-            pressed2 = false;
-        }
+            if(gamepad2.x && !pressed2)
+            {
+                lilGrab = !lilGrab;
+                pressed2 = true;
+            } else if (!gamepad2.x && pressed2)
+            {
+                pressed2 = false;
+            }
 
-        if(gamepad1.a && !pressed3)
-        {
-            slowMode = !slowMode;
-            pressed3 = true;
-        } else if (!gamepad1.a && pressed3)
-        {
-            pressed3 = false;
-        }
-        if(lilGrab)
-        {
-            grabbyLeft.setPosition(0.0);
-            grabbyRight.setPosition(1.0);
-        }
-        else
-        {
-            grabbyLeft.setPosition(0.45);
-            grabbyRight.setPosition(0.45);
-        }
+            if(gamepad1.a && !pressed3)
+            {
+                slowMode = !slowMode;
+                pressed3 = true;
+            } else if (!gamepad1.a && pressed3)
+            {
+                pressed3 = false;
+            }
+            if(lilGrab)
+            {
+                grabbyLeft.setPosition(0.0);
+                grabbyRight.setPosition(1.0);
+            }
+            else
+            {
+                grabbyLeft.setPosition(0.45);
+                grabbyRight.setPosition(0.45);
+            }
 
-        if(bigGrab)
-        {
-            bigGrabby.setPosition(0.05);
-        }
-        else
-        {
-            bigGrabby.setPosition(0.80);
-        }
+            if(bigGrab)
+            {
+                bigGrabby.setPosition(0.05);
+            }
+            else
+            {
+                bigGrabby.setPosition(0.80);
+            }
 
-        if(slowMode)
-        {
-            robot.driveTrain.setMotorPower(x/2, y/2, z/2);
-        } else {
-            robot.driveTrain.setMotorPower(x,y,z);
-        }
-
+            if(slowMode)
+            {
+                robot.driveTrain.setMotorPower(x/2, y/2, z/2);
+            } else {
+                robot.driveTrain.setMotorPower(x,y,z);
+            }
+//        }
 
 //        if(gamepad1.dpad_left){
 //            bigPos -= 0.01;
