@@ -172,11 +172,11 @@ public class TeleOp_v2Alt extends OpMode
     public void loop() {
 
 
-//        if (gamepad1.x && !done) {
-//            done = robot.goTo(0,0,0.5, DriveTrain.Direction.N);
-//        }
-//        else if(!gamepad1.x){
-//            done = false;
+        if (gamepad1.x && !done) {
+            done = robot.goTo(0,0,0.25, DriveTrain.Direction.N);
+        }
+        else if(!gamepad1.x){
+            done = false;
             x = gamepad1.left_stick_x;
             y = -gamepad1.left_stick_y;
             z = gamepad1.right_stick_x;
@@ -253,7 +253,7 @@ public class TeleOp_v2Alt extends OpMode
             } else {
                 robot.driveTrain.setMotorPower(x,y,z);
             }
-//        }
+        }
 
 //        if(gamepad1.dpad_left){
 //            bigPos -= 0.01;

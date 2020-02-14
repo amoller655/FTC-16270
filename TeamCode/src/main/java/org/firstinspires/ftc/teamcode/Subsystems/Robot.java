@@ -130,21 +130,21 @@ public class Robot {
         if(theta > wrapAngle(goalAngle + 10) || theta < wrapAngle(goalAngle - 10)){
             if(theta <= goalAngle){
                 if((goalAngle - theta) <= 180){
-                    turn = DriveTrain.Direction.TURNLEFT;
+                    turn = DriveTrain.Direction.TURNRIGHT;
                     remainingTurn = goalAngle - theta;
                 }
                 else {
-                    turn = DriveTrain.Direction.TURNRIGHT;
+                    turn = DriveTrain.Direction.TURNLEFT;
                     remainingTurn = 360 - (goalAngle - theta);
                 }
 
             } else {
                 if((theta - goalAngle) <= 180){
-                    turn = DriveTrain.Direction.TURNRIGHT;
+                    turn = DriveTrain.Direction.TURNLEFT;
                     remainingTurn = theta - goalAngle;
                 }
                 else {
-                    turn = DriveTrain.Direction.TURNLEFT;
+                    turn = DriveTrain.Direction.TURNRIGHT;
                     remainingTurn = 360 - (theta - goalAngle);
                 }
             }
@@ -169,11 +169,11 @@ public class Robot {
             if(theta > goalAngle)
             {
                 double correction = (theta - goalAngle) / 10;
-                driveTrain.adjust(DriveTrain.Direction.TURNLEFT, correction);
+                driveTrain.adjust(DriveTrain.Direction.TURNRIGHT, correction);
             } else if (theta < goalAngle)
             {
                 double correction = (goalAngle - theta) / 10;
-                driveTrain.adjust(DriveTrain.Direction.TURNRIGHT, correction);
+                driveTrain.adjust(DriveTrain.Direction.TURNLEFT, correction);
             }
             return false;
         } 
@@ -186,7 +186,7 @@ public class Robot {
 
     private double calculatePathAngle(double dx, double dy)
     {
-        double angle = Math.toDegrees(Math.atan2(dy, dx));
+        double angle = Math.toDegrees(Math.atan2(dx, dy));
         if(angle < 0)
             angle += 360;
         return angle;
